@@ -4,6 +4,8 @@ import { deserialize } from "../serializer";
 import { IFeatureSupportOptions, sanitize } from "../sanitizer";
 import { renderTemplateDontSanitize, renderTemplateDynamically } from "../renderer";
 import { MutatingTemplateArgs, TemplateArgs } from "../serializer/template-args";
+import { IParagraph } from "../serializer/types/paragraph";
+import { IImage } from "../serializer/types/image";
 
 const featureSupport: IFeatureSupportOptions = {
   supportedContainers: [],
@@ -122,6 +124,8 @@ const MyInfoProvider = (props: {children: React.ReactNode}) => {
 };
 
 // it is also possible to make mutating contexts, mutating functions, that depend on contexts
+// this can be used to create incrediblely complicated and intrincate behaviours
+// all of it which is editable (will be shown how to do later on)
 const rendered3_2 = renderTemplateDynamically(textTree3, new TemplateArgs(
   {
     buttons: new MutatingTemplateArgs((children) => {
@@ -154,6 +158,72 @@ const rendered3_2 = renderTemplateDynamically(textTree3, new TemplateArgs(
     </MyInfoProvider>
   );
 }));
+
+// You may also define functions
+// on this behaviour
+const TEXT_FROM_SERVER_4 = '<p data-on-click="clickAction">click me!</p>';
+
+const sanitized4 = sanitize({
+  fileResolver: null,
+}, featureSupport, TEXT_FROM_SERVER_4);
+const textTree4 = deserialize(sanitized4);
+const rendered4 = renderTemplateDynamically(textTree4, new TemplateArgs(
+  {
+    clickAction: () => {
+      alert("You clicked me");
+    }
+  }
+));
+
+// of course at the end of the day
+// you can do whatever you want with this
+// with full customization
+const TEXT_FROM_SERVER_5 = '<div class="container"><p data-on-click="clickAction">click me!</p></div><div class="container"><a class="image"><div class="image-container"><div class="image-pad" style="padding-bottom: 56.25%"><img alt="example" data-src-height="720" data-src-id="FILEID" data-src-width="1280" loading="lazy"></div></div></a></div>';
+
+const sanitized5 = sanitize({
+  fileResolver: (id: string) => {
+    // the id is going to be FILEID
+    return {
+      src: "./img/example-img.jpeg",
+      // no srcset specified
+    };
+  },
+}, featureSupport, TEXT_FROM_SERVER_5);
+const textTree5 = deserialize(sanitized5);
+const rendered5 = renderTemplateDynamically(textTree5, new TemplateArgs(
+  {
+    clickAction: () => {
+      alert("You clicked me");
+    }
+  }
+), {
+  onCustomAttributesFor: (element) => {
+    if ((element as IParagraph).type === "paragraph") {
+      return {
+        // now every paragraph will have this
+        onMouseOver: () => {
+          console.log("Over here");
+        }
+      }
+    }
+  },
+  onCustom: (element, props, info) => {
+    if ((element as IImage).type === "image") {
+      // image is now wrapped by this black box
+      return (
+        <div style={{backgroundColor: "black"}}>
+          {info.defaultReturn()}
+        </div>
+      );
+    }
+    
+    return info.defaultReturn();
+  }
+});
+
+
+// (however don't fret, UI Handlers provide custom elements in the next section)
+// and can be used to define custom fully editable components
 
 function Example() {
   return (
@@ -210,6 +280,32 @@ function Example() {
         </div>
         <div className="rich-text" style={{ padding: "10px", border: "solid 1px #ccc" }}>
           {rendered3_2}
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Original HTML (also sanitized):
+        </div>
+        <code>{TEXT_FROM_SERVER_4}</code>
+        <div>
+          rendered template dinamically (react component)
+        </div>
+        <div className="rich-text" style={{ padding: "10px", border: "solid 1px #ccc" }}>
+          {rendered4}
+        </div>
+      </section>
+
+      <section>
+        <div>
+          Original HTML (also sanitized):
+        </div>
+        <code>{TEXT_FROM_SERVER_5}</code>
+        <div>
+          rendered template dinamically (react component)
+        </div>
+        <div className="rich-text" style={{ padding: "10px", border: "solid 1px #ccc" }}>
+          {rendered5}
         </div>
       </section>
     </div>

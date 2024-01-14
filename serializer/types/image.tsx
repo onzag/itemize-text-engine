@@ -275,7 +275,7 @@ export function registerImage(registry: ISerializationRegistryType) {
           <div className="image-container">
             <div className="image-pad" style={{ paddingBottom: padPercentage }}>
               <img alt={arg.element.alt} sizes={arg.element.sizes} src={arg.element.src} srcSet={arg.element.srcSet} loading="lazy" />
-              {children}
+              {children || null}
             </div>
           </div>
         );

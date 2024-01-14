@@ -106,7 +106,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
         (children: React.ReactNode) => {
           return (
             <div className="video-container">
-              {children}
+              {children || null}
             </div>
           );
         },
@@ -138,7 +138,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
         return (
           <div className="video-container">
             <iframe src={iframeSrc} allowFullScreen={true} frameBorder="0" />
-            {children}
+            {children || null}
           </div>
         );
       },

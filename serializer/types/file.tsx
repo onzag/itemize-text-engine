@@ -126,7 +126,7 @@ export function registerFile(registry: ISerializationRegistryType) {
             </span>
             <span className="file-name" spellCheck={false}>{arg.element.fileName}</span>
             <span className="file-size" spellCheck={false}>{arg.element.size}</span>
-            {children}
+            {children || null}
           </span>
         );
       },
