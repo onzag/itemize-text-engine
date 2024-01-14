@@ -1,0 +1,388 @@
+@charset "UTF-8";
+.plain-text {
+  white-space: pre-wrap;
+}
+
+.rich-text {
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  width: 100%;
+}
+.rich-text table {
+  width: 100%;
+  border: solid 1px #ccc;
+}
+.rich-text table thead th {
+  background-color: #ccc;
+}
+.rich-text table td {
+  border: solid 1px #ccc;
+  padding: "0.5rem";
+}
+.rich-text a,
+.rich-text .link {
+  color: #0d47a1;
+  cursor: pointer;
+}
+.rich-text a.inactive,
+.rich-text .link.inactive {
+  cursor: auto;
+}
+.rich-text a.inactive:hover,
+.rich-text .link.inactive:hover {
+  text-decoration: underline;
+}
+.rich-text .template.selected {
+  box-shadow: 0 0 0 1px #0d47a1;
+}
+.rich-text .template:hover {
+  box-shadow: 0 0 0 1px #1a237e;
+}
+.rich-text .template:hover.selected {
+  box-shadow: 0 0 0 1px #880e4f;
+}
+.rich-text .container,
+.rich-text .custom {
+  position: relative;
+}
+.rich-text .ql-editor {
+  overflow: hidden;
+}
+.rich-text p,
+.rich-text li,
+.rich-text blockquote,
+.rich-text strong {
+  text-align: justify;
+}
+.rich-text p:empty::before,
+.rich-text h1:empty::before,
+.rich-text h2:empty::before,
+.rich-text h3:empty::before,
+.rich-text h4:empty::before,
+.rich-text h5:empty::before,
+.rich-text h6:empty::before {
+  content: " ";
+}
+.rich-text ul {
+  list-style: none;
+}
+html[dir=rtl] .rich-text ul li {
+  padding-right: 0;
+}
+html[dir=ltr] .rich-text ul li {
+  padding-left: 0;
+}
+.rich-text ul li::before {
+  content: "•";
+  color: #3f51b5;
+  display: inline-block;
+  width: 1rem;
+  position: absolute;
+}
+html[dir=rtl] .rich-text ul li::before {
+  margin-right: 1rem;
+  margin-left: 0.5rem;
+}
+html[dir=ltr] .rich-text ul li::before {
+  margin-left: 1rem;
+  margin-right: 0.5rem;
+}
+html[dir=rtl] .rich-text ul li > * {
+  padding-right: 2.5rem;
+}
+html[dir=ltr] .rich-text ul li > * {
+  padding-left: 2.5rem;
+}
+.rich-text ul li > ul > li::before {
+  content: "▪";
+}
+.rich-text ul li > ul > li > ul > li::before {
+  content: "‣";
+}
+.rich-text ol {
+  list-style: none;
+  counter-reset: item-count;
+}
+html[dir=rtl] .rich-text ol li {
+  padding-right: 0;
+}
+html[dir=ltr] .rich-text ol li {
+  padding-left: 0;
+}
+.rich-text ol li {
+  counter-increment: item-count;
+}
+.rich-text ol li::before {
+  content: "." counter(item-count);
+  color: #3f51b5;
+  display: inline-block;
+  width: 2em;
+  position: absolute;
+}
+html[dir=rtl] .rich-text ol li::before {
+  margin-left: 0.5rem;
+  text-align: left;
+  direction: ltr;
+}
+html[dir=ltr] .rich-text ol li::before {
+  margin-right: 0.5rem;
+  text-align: right;
+  direction: rtl;
+}
+html[dir=rtl] .rich-text ol li > * {
+  padding-right: 2.5rem;
+}
+html[dir=ltr] .rich-text ol li > * {
+  padding-left: 2.5rem;
+}
+.rich-text blockquote {
+  font-size: 1rem;
+  margin: 1rem auto;
+  font-style: italic;
+  color: #455a64;
+  line-height: 1.6;
+  position: relative;
+  background: rgba(0, 0, 0, 0.09);
+}
+html[dir=rtl] .rich-text blockquote {
+  padding: 1.2rem 50px 1.2rem 30px;
+  border-right: 8px solid #26a69a;
+}
+html[dir=ltr] .rich-text blockquote {
+  padding: 1.2rem 30px 1.2rem 50px;
+  border-left: 8px solid #26a69a;
+}
+.rich-text blockquote::before {
+  font-family: Arial;
+  content: "“";
+  color: #26a69a;
+  font-size: 4rem;
+  position: absolute;
+  top: -10px;
+}
+html[dir=rtl] .rich-text blockquote::before {
+  right: 10px;
+}
+html[dir=ltr] .rich-text blockquote::before {
+  left: 10px;
+}
+.rich-text blockquote::after {
+  content: "";
+}
+.rich-text h1,
+.rich-text h2,
+.rich-text h3,
+.rich-text h4,
+.rich-text h5,
+.rich-text h6 {
+  font-weight: 300;
+}
+html[dir=rtl] .rich-text h1,
+html[dir=rtl] .rich-text h2,
+html[dir=rtl] .rich-text h3,
+html[dir=rtl] .rich-text h4,
+html[dir=rtl] .rich-text h5,
+html[dir=rtl] .rich-text h6 {
+  text-align: right;
+}
+html[dir=ltr] .rich-text h1,
+html[dir=ltr] .rich-text h2,
+html[dir=ltr] .rich-text h3,
+html[dir=ltr] .rich-text h4,
+html[dir=ltr] .rich-text h5,
+html[dir=ltr] .rich-text h6 {
+  text-align: left;
+}
+.rich-text h1 {
+  font-size: 1.6rem;
+}
+.rich-text h2 {
+  font-size: 1.5rem;
+}
+.rich-text h3 {
+  font-size: 1.4rem;
+}
+.rich-text h4 {
+  font-size: 1.3rem;
+}
+.rich-text h5 {
+  font-size: 1.2rem;
+}
+.rich-text h6 {
+  font-size: 1.1rem;
+}
+.rich-text .image {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rich-text .image .image-container {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+}
+.rich-text .image .image-container .image-pad {
+  position: relative;
+  width: 100%;
+}
+.rich-text .image .image-container .image-pad img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.rich-text .image.selected img {
+  box-shadow: 0 0 5px #0d47a1, 0 0 5px #0d47a1, 0 0 5px #0d47a1;
+}
+.rich-text img.selected {
+  box-shadow: 0 0 5px #0d47a1, 0 0 5px #0d47a1, 0 0 5px #0d47a1;
+}
+.rich-text .video {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rich-text .video .video-container {
+  width: 100%;
+  max-width: 700px;
+  padding-bottom: 56.25%;
+  height: 0;
+  position: relative;
+  background-color: #ccc;
+}
+.rich-text .video .video-container::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: calc(50% - 50px);
+  left: calc(50% - 50px);
+  width: 100px;
+  height: 100px;
+  opacity: 0.5;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMzMsNDQwYTM1LjM3LDM1LjM3LDAsMCwxLTE3LjUtNC42N2MtMTItNi44LTE5LjQ2LTIwLTE5LjQ2LTM0LjMzVjExMWMwLTE0LjM3LDcuNDYtMjcuNTMsMTkuNDYtMzQuMzNhMzUuMTMsMzUuMTMsMCwwLDEsMzUuNzcuNDVMMzk5LjEyLDIyNS40OGEzNiwzNiwwLDAsMSwwLDYxTDE1MS4yMyw0MzQuODhBMzUuNSwzNS41LDAsMCwxLDEzMyw0NDBaIi8+PC9zdmc+Cg==");
+}
+.rich-text .video .video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.rich-text .video.selected .video-container {
+  box-shadow: 0 0 5px #0d47a1, 0 0 5px #0d47a1, 0 0 5px #0d47a1;
+}
+.rich-text .video.inactive .video-container::after {
+  content: " ";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.rich-text .container.selected {
+  box-shadow: inset 0 0 5px #33691e;
+}
+.rich-text .container:has(.selected) {
+  box-shadow: inset 0 0 3px #33691e;
+}
+
+.file {
+  width: 100px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  user-select: none;
+  font-size: 85px;
+}
+.file span[contenteditable] {
+  width: 100%;
+  position: relative;
+  height: 100%;
+}
+.file .file-container {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+.file .file-container .thumbnail {
+  width: 100%;
+  height: 75px;
+  display: block;
+  object-fit: contain;
+  border-radius: 3px;
+  filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.3)) drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.3));
+}
+.file .file-container .file-icon {
+  width: 50px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' focusable='false' viewBox='0 0 24 24' aria-hidden='true'%3E%3Cpath fill='rgba(0,0,0,0.8)' d='M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z'%3E%3C/path%3E%3C/svg%3E");
+  height: 75px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: block;
+}
+.file .file-container .file-icon .file-extension {
+  display: block;
+  width: 100%;
+  font-size: 1rem;
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  font-weight: 900;
+  background-color: white;
+  border: solid 1px #ccc;
+  padding: 0 2px;
+  white-space: nowrap;
+  border-radius: 0 0 2px 2px;
+}
+.file .file-container .file-name {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  padding-top: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+.file .file-container .file-size {
+  display: block;
+  width: 100%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+}
+.file.rejected .file-container .thumbnail {
+  filter: drop-shadow(0px 0px 1px #e57373) drop-shadow(0px 0px 10px #e57373);
+}
+.file.rejected .file-container .file-size,
+.file.rejected .file-container .file-name,
+.file.rejected .file-container .file-icon .file-extension {
+  color: #e57373;
+}
+.file.rejected:hover .file-container .thumbnail {
+  filter: drop-shadow(0px 0px 1px #f44336) drop-shadow(0px 0px 10px #f44336);
+}
+.file.rejected:hover .file-container .file-size,
+.file.rejected:hover .file-container .file-name,
+.file.rejected:hover .file-container .file-icon .file-extension {
+  color: #f44336;
+}
+.file.selected .file-container .thumbnail,
+.file.selected .file-container .file-icon, .file:focus .file-container .thumbnail,
+.file:focus .file-container .file-icon {
+  filter: drop-shadow(0px 0px 1px #0d47a1) drop-shadow(0px 0px 10px #0d47a1);
+}

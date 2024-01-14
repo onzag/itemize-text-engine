@@ -7,7 +7,7 @@
  */
 
 import React from "react";
-import { DOMWindow } from "../../../../util";
+import { DOMWindow } from "./dom";
 import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
 import { IText } from "./types/text";
 import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";

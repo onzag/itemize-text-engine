@@ -337,10 +337,10 @@ export function postprocess(
           // dompurify rechecks this which is really annoying
           // after you move the image around and purify it
           // it will run it again against the same code
-          if (options.mail && !src.startsWith("cid")) {
+          if ((options.mail && !src.startsWith("cid")) || !options.mail) {
             node.parentElement.parentElement.parentElement.parentElement.removeChild(node.parentElement.parentElement.parentElement);
           }
-        } else if (options.mail && !src.startsWith("cid")) {
+        } else if ((options.mail && !src.startsWith("cid")) || !options.mail) {
           node.parentElement && node.parentElement.removeChild(node);
         }
       } else {
@@ -527,7 +527,10 @@ export function postprocess(
         if (!featureSupport.supportsContainers) {
           node.classList.remove(className);
         } else if (featureSupport.supportedContainers) {
-          !featureSupport.supportedContainers.includes(className.substr(CONTAINER_CLASS_PREFIX.length)) && node.classList.remove(className);
+          const shouldRemove = !featureSupport.supportedContainers.includes(className.substr(CONTAINER_CLASS_PREFIX.length));
+          if (shouldRemove) {
+            node.classList.remove(className);
+          }
         }
       } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
         if (!featureSupport.supportsCustom) {
@@ -549,6 +552,21 @@ export function postprocess(
         }
       }
     });
+  }
+
+  if (node.tagName === "DIV") {
+    if (
+      featureSupport.supportsContainers
+    ) {
+      if (
+        !node.classList.contains("container") &&
+        !Array.from(node.classList).some((v) => v.startsWith("container-") || v.startsWith("custom-"))
+      ) {
+        node.classList.add("container");
+      }
+    } else {
+      node.parentElement && node.parentElement.removeChild(node);
+    }
   }
 
   if (node.tagName === "QUOTE" && !featureSupport.supportsQuote) {

@@ -5,7 +5,6 @@ import {
 import { IText } from "../serializer/types/text";
 import { DOMWindow } from "../serializer/dom";
 import { TemplateArgs } from "../serializer/template-args";
-import equals from "deep-equal";
 import { IFeatureSupportOptions, IPostProcessingOptions, sanitize } from "../sanitizer";
 import React from "react";
 
