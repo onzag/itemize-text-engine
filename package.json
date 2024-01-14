@@ -1,0 +1,30 @@
+{
+  "name": "itemize-text-engine",
+  "version": "1.0.0",
+  "description": "Itemize text engine used to parse and reactify html text + fast prototyping slate editor integration",
+  "main": "index.js",
+  "scripts": {
+    "install": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Edward González",
+  "license": "MIT",
+  "peerDependencies": {
+    "@types/react": "^17.0.74",
+    "react": "^17.0.2"
+  },
+  "dependencies": {
+    "@types/deep-equal": "^1.0.4",
+    "@types/dompurify": "^3.0.5",
+    "@types/jsdom": "^21.1.6",
+    "@types/uuid": "^3.4.13",
+    "deep-equal": "^1.1.2",
+    "dompurify": "^3.0.8",
+    "jsdom": "^23.2.0",
+    "typescript": "^4.9.5",
+    "uuid": "^3.4.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.11"
+  }
+}
