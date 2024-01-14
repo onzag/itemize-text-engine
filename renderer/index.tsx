@@ -189,6 +189,22 @@ export function renderTemplateAsNode(
   return cheapdiv;
 }
 
+/**
+ * Performs a simple template rendering
+ * from a string based HTML template based on the text specs
+ * 
+ * his function does not sanitize!!!
+ * 
+ * @param template the template in question
+ * @param args the arguments
+ */
+export function renderTemplateDontSanitize(
+  template: string,
+  args: any,
+): string {
+  return renderTemplateAsNode(template, args).innerHTML;
+}
+
 
 /**
  * Performs a simple template rendering
@@ -235,7 +251,7 @@ export function renderTemplate(
 export function renderTemplateDynamically(
   document: IRootLevelDocument,
   args: TemplateArgs,
-  options: IReactifyExtraOptions,
+  options: IReactifyExtraOptions = {},
 ): React.ReactNode {
   if (document === NULL_DOCUMENT) {
     return null;

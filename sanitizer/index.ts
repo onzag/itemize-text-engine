@@ -46,6 +46,17 @@ export interface IPostProcessingOptions {
   mailShouldAttachFile?: (fileId: string) => void;
 
   /**
+   * Triggers when the email should attach a file
+   * for the given id, while the file will also go over the file
+   * resolver, as a non image, this function may provide a cleaner
+   * way to specify this behaviour
+   * 
+   * @param fileId 
+   * @returns 
+   */
+  mailShouldAttachCidFile?: (fileId: string) => void;
+
+  /**
    * An url for images that have failed to resolve
    */
   imageFail?: string;
@@ -377,6 +388,8 @@ export function postprocess(
         if (options.mail && !currentFile.src.startsWith("cid:")) {
           console.warn("You have created a postprocessing pipeline for an email and the source does not start with 'cid:' the value is " +
             JSON.stringify(currentFile.src));
+        } else if (options.mail) {
+          options.mailShouldAttachCidFile && options.mailShouldAttachCidFile(srcId);
         }
 
         if (

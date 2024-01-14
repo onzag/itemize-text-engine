@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { deserialize } from "../serializer";
+import { deserialize, deserializePlain, serialize, serializeString } from "../serializer";
 import { sanitize } from "../sanitizer";
 
 // notice the malicious script and the malicious css style tag
@@ -9,6 +9,7 @@ const TEXT_FROM_SERVER_2 = '<img src="https://external-server.com" /><p>invalid 
 const TEXT_FROM_SERVER_3 = '<p>click <a href="https://external-server.com/malicious">here</a> or here <a href="./safe">here</a> </p>';
 const TEXT_FROM_SERVER_4 = '<div class="container-happy"><p class="rich-text--sparkling-text">allowed custom class</p></div><div class="container-sad"><p>invalid container type</p></div><p>outside of container</p>';
 const TEXT_FROM_SERVER_5 = '<a class="image"><div class="image-container"><div class="image-pad" style="padding-bottom: 56.25%"><img alt="example" data-src-height="720" data-src-id="FILEID" data-src-width="1280" loading="lazy"></div></div></a>';
+const TEXT_FROM_SERVER_6 = "This is just\nSome plain text";
 
 // this is safe to use in dangerouslySetInnerHTML
 const sanitized1 = sanitize({
@@ -173,6 +174,49 @@ const sanitized5 = sanitize({
   supportsVideos: true,
 }, TEXT_FROM_SERVER_5);
 
+const filesToAttach: string[] = [];
+const cidFilesToAttach: string[] = [];
+const sanitized5_2 = sanitize({
+  // resolving a file
+  fileResolver: (id: string) => {
+    // the id is going to be FILEID
+    return {
+      // this is dangerous, don't trust the file ID as it is
+      // always generate own ids
+      src: "cid:" + id,
+    };
+  },
+  mail: true,
+  mailShouldAttachFile: (fileId) => {
+    filesToAttach.push(fileId);
+  },
+  mailShouldAttachCidFile: (fileId) => {
+    cidFilesToAttach.push(fileId);
+  },
+}, {
+  supportedContainers: [],
+  supportedCustoms: [],
+  supportedRichClasses: [],
+  supportedTables: [],
+  supportsContainers: true,
+  supportsCustom: true,
+  supportsCustomStyles: true,
+  // disabling external links
+  supportsExternalLinks: false,
+  supportsFiles: true,
+  supportsFilesAccept: null,
+  supportsImages: true,
+  supportsImagesAccept: null,
+  supportsLinks: true,
+  supportsLists: true,
+  supportsQuote: true,
+  supportsRichClasses: true,
+  supportsTables: true,
+  supportsTemplating: true,
+  supportsTitle: true,
+  supportsVideos: true,
+}, TEXT_FROM_SERVER_5);
+
 
 // this is actually not sanitized, however the deserializer doesn't understand script values
 // but you may notice that position fixed, will go through without problem this way
@@ -184,6 +228,26 @@ const textTree1_2 = deserialize(sanitized1);
 const textTree2 = deserialize(sanitized2);
 
 const textTree3 = deserialize(sanitized3);
+
+// because this is just plain text is actually safe to use
+const textTree6 = deserializePlain(TEXT_FROM_SERVER_6);
+
+// this is reserialized as string because it is text plain
+// if the original source was html it would produce htmlElement list
+// the serializeString is the preferred method
+const reSerialized6 = serialize(textTree6);
+
+// force it render as rich text, will actually produce HTMLElement array
+// however due to caching, we need actually a new object with a new ID
+// better to use a uuid to keep things safe but in practise you shouldn't be forcing
+// these serializations like this, this is for demonstration only
+const textTree6_clone = {
+  ...textTree6,
+  rich: true,
+  id: "MY_ID",
+};
+const reSerialized6_3 = serializeString(textTree6_clone);
+
 
 function Example() {
   return (
@@ -271,6 +335,30 @@ function Example() {
           Displayed of sanitized
         </div>
         <div className="rich-text" dangerouslySetInnerHTML={{__html: sanitized5}} style={{padding: "10px", border: "solid 1px #ccc"}}/>
+        <div>
+          Generated for email
+        </div>
+        <code>{sanitized5_2}</code>
+        <code>{JSON.stringify({filesToAttach, cidFilesToAttach}, null, 2)}</code>
+      </section>
+
+      <section>
+        <div>
+          Original PLAIN TEXT:
+        </div>
+        <code>{JSON.stringify(TEXT_FROM_SERVER_6)}</code>
+        <div>
+          Deserialized Plan Text Tree (The tree can be used so the rich text editor can produce/use plain text too to keep consistency):
+        </div>
+        <code>{JSON.stringify(textTree6, null, 2)}</code>
+        <div>
+          Reserialized Original:
+        </div>
+        <code>{JSON.stringify(reSerialized6, null, 2)}</code>
+        <div>
+          Reserialized Force HTML (Bad practise):
+        </div>
+        <code>{JSON.stringify(reSerialized6_3, null, 2)}</code>
       </section>
     </div>
   );
