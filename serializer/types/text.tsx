@@ -233,7 +233,7 @@ export function registerText(registry: ISerializationRegistryType) {
     }
 
     if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
-      return arg.extraOptions.onCustomWrap(arg.element, toRender);
+      return arg.extraOptions.onCustomWrap(arg.element, toRender, ((toRender as any) && (toRender as any).key) || null);
     }
 
     return (

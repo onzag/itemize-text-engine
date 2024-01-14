@@ -30,6 +30,7 @@ const build = esbuild.build({
   entryPoints: [
     './example1.tsx',
     './example2.tsx',
+    './example3.tsx',
   ],
   entryNames: "[name]",
   sourcemap: 'inline',
@@ -52,7 +53,7 @@ const build = esbuild.build({
     '.tsx': "tsx",
   },
   // commons file name
-  chunkNames: 'commons',
+  chunkNames: 'commons-[hash]',
   target: ['chrome60', 'firefox60', 'safari11', 'edge18'],
   // modified tsconfig
   tsconfigRaw: JSON.stringify(tsConfig),

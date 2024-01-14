@@ -908,7 +908,7 @@ export function reactifyElementBase(
           }
 
           if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
-            return arg.extraOptions.onCustomWrap(base as any, toRender);
+            return arg.extraOptions.onCustomWrap(base as any, toRender, ((toRender as any) && (toRender as any).key) || null);
           } else {
             return toRender;
           }

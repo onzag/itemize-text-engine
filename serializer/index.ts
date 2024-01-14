@@ -80,7 +80,7 @@ export interface IReactifyExtraOptions {
    * Allows to wrap an element with features of the choosing
    * return the elementAsNode itself or a new node to replace it
    */
-  onCustomWrap?: (element: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
+  onCustomWrap?: (element: RichElement | IText, elementAsNode: React.ReactNode, key: string) => React.ReactNode;
 }
 
 /**

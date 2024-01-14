@@ -98,7 +98,7 @@ const rendered3 = renderTemplateDynamically(textTree3, new TemplateArgs(
 
 const MyInfoContext = React.createContext<string[]>([]);
 
-const MyInfoProvider = (props: {children: React.ReactNode}) => {
+const MyInfoProvider = (props: { children: React.ReactNode }) => {
   const buttonSets = [
     ['button1', 'button2', 'button3'],
     ['button4', 'button5', 'button6'],
@@ -211,16 +211,27 @@ const rendered5 = renderTemplateDynamically(textTree5, new TemplateArgs(
     if ((element as IImage).type === "image") {
       // image is now wrapped by this black box
       return (
-        <div style={{backgroundColor: "black"}}>
+        <div style={{ backgroundColor: "black" }}>
           {info.defaultReturn()}
         </div>
       );
     }
-    
+
     return info.defaultReturn();
+  },
+  onCustomWrap: (element, elementAsNode, key) => {
+    // we just going to wrap every single element with this
+    // that includes just text nodes
+    // all of it
+    return (
+      <span style={{ display: "contents" }} key={key}>
+        {elementAsNode}
+      </span>
+    )
   }
 });
 
+// there is more on templating that is not included here, for example, data-context and non-root-inheritables
 
 // (however don't fret, UI Handlers provide custom elements in the next section)
 // and can be used to define custom fully editable components
@@ -231,6 +242,9 @@ function Example() {
       <h1>Advanced Displaying</h1>
 
       <section>
+        <h4>
+          Showing templating capabilities to fill content
+        </h4>
         <div>
           Original HTML (also sanitized):
         </div>
@@ -252,6 +266,9 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          Possibility to fill gaps of html content with dynamic react components
+        </h4>
         <div>
           Original HTML (also sanitized):
         </div>
@@ -265,6 +282,9 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          Possibility to render templates using loops, and using mutating data
+        </h4>
         <div>
           Original HTML (also sanitized):
         </div>
@@ -284,6 +304,9 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          Assingning arbitrary functions based on a context
+        </h4>
         <div>
           Original HTML (also sanitized):
         </div>
@@ -297,6 +320,10 @@ function Example() {
       </section>
 
       <section>
+      <h4>
+          Full customization, all images get a black background, everything is wrapped in spans, and onMouseOver
+          every paragraph will trigger a function call to log "Over here"
+        </h4>
         <div>
           Original HTML (also sanitized):
         </div>

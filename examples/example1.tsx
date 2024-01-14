@@ -255,6 +255,10 @@ function Example() {
       <h1>Basic Parsing and Data Displaying</h1>
 
       <section>
+        <h4>
+          simple parsing and deserializing, this example shows how to deserialize and build a tree safely
+          note the sheer amount of elements that represent security issues are removed
+        </h4>
         <div>
           Original HTML:
         </div>
@@ -274,6 +278,9 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          simple parsing and deserializing, example of an image taken from an external server being denied
+        </h4>
         <div>
           Original HTML:
         </div>
@@ -289,6 +296,10 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          Due to configuration settings, external links are denied but internal
+          are allowed
+        </h4>
         <div>
           Original HTML:
         </div>
@@ -304,6 +315,10 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          This dynamic content, uses custom classes in order to apply stylistic purposes
+          however some of these classes are not allowed and are stripped
+        </h4>
         <div>
           Original HTML:
         </div>
@@ -315,7 +330,7 @@ function Example() {
         <div>
           Displayed of sanitized
         </div>
-        <div className="rich-text" dangerouslySetInnerHTML={{__html: sanitized4}} style={{padding: "10px", border: "solid 1px #ccc"}}/>
+        <div className="rich-text" dangerouslySetInnerHTML={{ __html: sanitized4 }} style={{ padding: "10px", border: "solid 1px #ccc" }} />
         <div>
           Sanitized HTML (containers are not allowed):
         </div>
@@ -323,6 +338,10 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          This shows image resolving, images are not expected to be part of the text itself, but rather incorportated
+          during a postprocess based on an id, this allows for images to be retrieved dynamically
+        </h4>
         <div>
           Original HTML:
         </div>
@@ -334,15 +353,18 @@ function Example() {
         <div>
           Displayed of sanitized
         </div>
-        <div className="rich-text" dangerouslySetInnerHTML={{__html: sanitized5}} style={{padding: "10px", border: "solid 1px #ccc"}}/>
+        <div className="rich-text" dangerouslySetInnerHTML={{ __html: sanitized5 }} style={{ padding: "10px", border: "solid 1px #ccc" }} />
         <div>
           Generated for email
         </div>
         <code>{sanitized5_2}</code>
-        <code>{JSON.stringify({filesToAttach, cidFilesToAttach}, null, 2)}</code>
+        <code>{JSON.stringify({ filesToAttach, cidFilesToAttach }, null, 2)}</code>
       </section>
 
       <section>
+        <h4>
+          Plain text parsing
+        </h4>
         <div>
           Original PLAIN TEXT:
         </div>
