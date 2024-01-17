@@ -1,0 +1,89 @@
+.slateEditorToolbar {
+    width: 100%;
+}
+
+.slateEditorToolbarInternal {
+    width: 100%;
+    display: flex;
+}
+
+.slateEditorToolbarButton {
+    width: 35px;
+    height: 35px;
+    appearance: none;
+    border-radius: 0;
+    color: black;
+    border: solid 1px #707070;
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.slateEditorToolbarButton:disabled {
+    color: #303030;
+    border: solid 1px #404040;
+    background-color: #ddd;
+    cursor: default;
+}
+
+.slateEditorVdivider {
+    width: "10px";
+}
+
+.slateEditorToolbarInternalSpacer {
+    flex: 1;
+}
+
+.slateEditorDefaultEditorContainer {
+    display: flex;
+}
+
+.slateEditorDrawer {
+    padding: 0;
+    background: #ccc;
+}
+
+.slateEditorDrawer.open {
+    width: 250px;
+    padding: 1rem;
+    min-height: 100px;
+    border-left: solid;
+}
+
+html[dir="ltr"] .slateEditorWrapperDrawerElementTitleIconRtlOnly, html:not([dir]) .slateEditorWrapperDrawerElementTitleIconRtlOnly  {
+    display: none;
+}
+
+html[dir="rtl"] .slateEditorWrapperDrawerElementTitleIconLtrOnly {
+    display: none;
+}
+
+.slateEditorWrapperDrawerElementTitleWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.slateEditorWrapperDrawerElementTitleWrapper h6 {
+    margin: 0;
+}
+
+.slateEditorWrapperDrawerTabSelected {
+    height: 35px;
+    appearance: none;
+    border-radius: 0;
+    color: black;
+    border: solid 1px #707070;
+    background-color: lightblue;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.slateEditorWrapperDrawerTab {
+    height: 35px;
+    appearance: none;
+    border-radius: 0;
+    color: black;
+    border: solid 1px #707070;
+    background-color: #eee;
+    cursor: pointer;
+}

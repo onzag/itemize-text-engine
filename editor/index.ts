@@ -1,5 +1,6 @@
 import { IRootLevelDocument, RichElement } from "../serializer";
 import { IText } from "../serializer/types/text";
+import { IBaseI18nRichTextInfo } from "./slate";
 
 /**
  * locale replacer function used here so that itemize is not needed to be imported
@@ -175,7 +176,7 @@ const specialTypes = {
  * The node information that is extracted of a given node used
  * to be displayed to the user
  */
-interface INodeInfo {
+export interface INodeInfo {
   /**
    * The name that is given, human readable in the given language
    */

@@ -6,14 +6,7 @@
 
 import React from "react";
 import { IDrawerContainerProps } from "../wrapper";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-import FilledInput from "@mui/material/FilledInput";
 import { Path } from "slate";
-import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 
 const style = {
   box: {

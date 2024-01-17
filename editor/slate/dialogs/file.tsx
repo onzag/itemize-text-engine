@@ -4,10 +4,7 @@
  */
 
 import React from "react";
-import { Dialog } from "../../dialog";
-import { capitalize } from "../../../../../util";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
+import ReactDOM from "react-dom";
 
 /**
  * The error dialog props
@@ -31,6 +28,44 @@ interface IFileLoadErrorDialogProps {
    * Ok
    */
   i18nOk: string;
+  /**
+   * The component for the dialog
+   */
+  Dialog?: React.ComponentType<IDialogComponentProps>;
+}
+
+export interface IDialogComponentProps {
+  children: string;
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  buttons: Array<{
+    label: string;
+    onClick: () => void;
+    action: "primary" | "secondary";
+  }>;
+}
+
+function DefaultDialog(props: IDialogComponentProps) {
+  if (!props.open) {
+    return null;
+  }
+
+  const dialog = (
+    <div className="slateEditorDialogBackdrop">
+      <div className="slateEditorDialog">
+        <div className="slateEditorDialogTitle">{props.title}</div>
+        <div className="slateEditorDialogContent">{props.children}</div>
+        <div className="slateEditorButtons">
+          {props.buttons.map((v) => (
+            <button key={v.action} onClick={v.onClick}>{v.label}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  return ReactDOM.createPortal(dialog, document.body);
 }
 
 /**
@@ -50,21 +85,23 @@ export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialo
    * The render function
    */
   public render() {
+    const Dialog = this.props.Dialog || DefaultDialog;
     return (
       <Dialog
-        fullScreen={false}
         open={!!this.props.currentLoadError}
         onClose={this.onClose}
-        title={capitalize(this.props.i18nGenericError)}
+        title={this.props.i18nGenericError}
         buttons={
-          <Button onClick={this.props.dismissCurrentLoadError}>
-            {capitalize(this.props.i18nOk)}
-          </Button>
+          [
+            {
+              label: this.props.i18nOk,
+              onClick: this.props.dismissCurrentLoadError,
+              action: "primary",
+            }
+          ]
         }
       >
-        <Typography>
-          {this.props.currentLoadError}
-        </Typography>
+        {this.props.currentLoadError}
       </Dialog>
     );
   }

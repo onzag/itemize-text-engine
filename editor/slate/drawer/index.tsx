@@ -7,63 +7,100 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
-import { GeneralOptions } from "./general";
-import { StylesOptions } from "./styles";
-import { ActionsOptions } from "./actions";
-import { TemplatingOptions } from "./templating";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import SettingsIcon from "@mui/icons-material/Settings";
-import BorderStyleIcon from "@mui/icons-material/BorderStyle";
-import WebIcon from "@mui/icons-material/Web";
-import TouchAppIcon from "@mui/icons-material/TouchApp";
-import Typography from "@mui/material/Typography";
-import { getInfoFor } from "../../../../internal/text/serializer";
-import { AltBadgeReactioner } from "../../alt-badge-reactioner";
-import { AltSectionScroller } from "../../alt-section-scroller";
-import AltPriorityShifter from "../../../../components/accessibility/AltPriorityShifter";
-import Box from "@mui/material/Box";
+// import { GeneralOptions } from "./general";
+// import { StylesOptions } from "./styles";
+// import { ActionsOptions } from "./actions";
+// import { TemplatingOptions } from "./templating";
+import { INodeInfo, getInfoFor } from "../..";
 
-const style = {
-  tab: {
-    minWidth: "auto",
-  },
-  elementTitleContainer: {
-    width: "100%",
-  },
-  elementTitle: {
-    textTransform: "capitalize",
-    fontWeight: 700,
-    color: "#444",
-    fontSize: "1rem",
-    height: "1rem",
-    flex: "0 0 1rem",
-    display: "inline-block",
-  },
-  elementTitleSelected: {
-    color: "#0d47a1",
-  },
-  elementTitleUnselected: {
-    cursor: "pointer",
 
-    "&:hover, &:active": {
-      color: "#2196f3",
-    },
-  },
-  ltronly: {
-    ["html[dir='rtl'] &"]: {
-      display: "none",
-    }
-  },
-  rtlonly: {
-    ["html[dir='ltr'] &"]: {
-      display: "none",
-    }
-  },
-  elementIcon: {
-    fontWeight: 100,
-  },
-};
+export interface IWrapperDrawerElementTitleProps {
+  info: INodeInfo;
+  entirePath: Array<{ info: INodeInfo; path: string[] }>;
+  isCurrent: boolean;
+  index: number;
+  onSelect: () => void;
+}
+
+function DefaultWrapperDrawerElementTitle(props: IWrapperDrawerElementTitleProps) {
+  return (
+    <h6>
+      {
+        props.info.isInteractive ? (
+          <span className="slateEditorWrapperDrawerElementTitleIconRtlOnly">{String.fromCharCode(9094)}</span>
+        ) : null
+      }
+      <span
+        className={props.isCurrent ? "slateEditorWrapperDrawerElementTitleSelected" : "slateEditorWrapperDrawerElementTitle"}
+        role="button"
+        aria-current={props.isCurrent}
+        onClick={props.onSelect}
+      >
+        {props.info.name}
+      </span>
+      {
+        props.info.isInteractive ? (
+          <span className="slateEditorWrapperDrawerElementTitleIconLtrOnly">{String.fromCharCode(9094)}</span>
+        ) : null
+      }
+      {
+        props.isCurrent ? null : (
+          <>
+            <span className="slateEditorWrapperDrawerElementTitleIconLtrOnly">{String.fromCharCode(11106)}</span>
+            <span className="slateEditorWrapperDrawerElementTitleIconRtlOnly">{String.fromCharCode(11106)}</span>
+          </>
+        )
+      }
+    </h6>
+  )
+}
+
+function DefaultWrapperDrawerElementTitleWrapper(props: { children: React.ReactNode }) {
+  return (
+    <div className="slateEditorWrapperDrawerElementTitleWrapper">
+      {props.children}
+    </div>
+  );
+}
+
+type IOptionType = "MAIN" | "STYLES" | "ACTIONS" | "TEMPLATING";
+type SetOptionTypeFn = (v: IOptionType) => void;
+
+export interface IWrapperDrawerInfoPanelWrapperProps {
+  accessibilitySelectedOption: IOptionType;
+  selectedOption: IOptionType;
+  setSelectedOption: SetOptionTypeFn;
+  setAccessibilitySelectedOption: SetOptionTypeFn;
+  children: React.ReactNode;
+}
+
+export interface IWrapperDrawerTabsProps {
+  accessibilitySelectedOption: IOptionType;
+  selectedOption: IOptionType;
+  setSelectedOption: SetOptionTypeFn;
+  setAccessibilitySelectedOption: SetOptionTypeFn;
+  options: Array<{ id: string; label: string; }>
+}
+
+export function DefaultWrapperDrawerInfoPanelWrapper(props: IWrapperDrawerInfoPanelWrapperProps) {
+  return props.children as any;
+}
+
+export function DefaultWrapperDrawerTabs(props: IWrapperDrawerTabsProps) {
+  return (
+    <div className="slateEditorWrapperDrawerTabs">
+      {props.options.map((v) => (
+        <button
+          onClick={props.setSelectedOption.bind(null, v.id)}
+          key={v.id}
+          className={props.selectedOption === v.id ? "slateEditorWrapperDrawerTabSelected" : "slateEditorWrapperDrawerTab"}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /**
  * This is the wrapper drawer itself
@@ -73,8 +110,8 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   // we grab this from local storage, this won't affect SSR because the drawer won't
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
-  const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
-  const [accessibilitySelectedOption, useAccessibilitySelectedOption] = useState(null as string);
+  const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN" as IOptionType);
+  const [accessibilitySelectedOption, useAccessibilitySelectedOption] = useState(null as IOptionType);
 
   useEffect(() => {
     if (!props.drawerOpen) {
@@ -83,14 +120,10 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   }, [props.drawerOpen]);
 
   // update the given location
-  const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {
+  const setLocationCallback = useCallback((value: IOptionType) => {
     localStorage.setItem("SLATE_DRAWER_LAST_LOCATION", value);
     useAccessibilitySelectedOption(value);
     setLocation(value);
-  }, []);
-
-  const forceOnClickEvent = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    useAccessibilitySelectedOption((e.target as HTMLElement).dataset.value);
   }, []);
 
   // now we need to build the settings
@@ -101,36 +134,35 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   if (props.state.currentSelectedElement) {
     // and according to that decide which panel to render
     let infoPanel: React.ReactNode = null;
-    switch (location) {
-      case "MAIN":
-        infoPanel = <GeneralOptions {...props} />;
-        break;
-      case "STYLES":
-        infoPanel = <StylesOptions {...props} />;
-        break;
-      case "ACTIONS":
-        infoPanel = <ActionsOptions {...props} />;
-        break;
-      case "TEMPLATING":
-        infoPanel = <TemplatingOptions {...props} />;
-        break;
-    }
+    // switch (location) {
+    //   case "MAIN":
+    //     infoPanel = <GeneralOptions {...props} />;
+    //     break;
+    //   case "STYLES":
+    //     infoPanel = <StylesOptions {...props} />;
+    //     break;
+    //   case "ACTIONS":
+    //     infoPanel = <ActionsOptions {...props} />;
+    //     break;
+    //   case "TEMPLATING":
+    //     infoPanel = <TemplatingOptions {...props} />;
+    //     break;
+    //}
 
     const selectedNodeInfo = getInfoFor(
       props.state.currentSelectedElement,
-      props.i18nRichInfo,
+      props.baseI18n,
     );
-    const selectedNodePath = props.state.currentSelectedElementAnchor;
 
     const potentialBlockParent = props.state.currentSelectedElement === props.state.currentSelectedInlineElement ?
       getInfoFor(
         props.state.currentSelectedBlockElement,
-        props.i18nRichInfo,
+        props.baseI18n,
       ) : null;
 
     const superBlockPaths = (props.state.currentSelectedSuperBlockElements || []).filter((e) => e !== props.state.currentSelectedElement).map((v, index) => {
       return {
-        info: getInfoFor(v, props.i18nRichInfo),
+        info: getInfoFor(v, props.baseI18n),
         path: props.state.currentSelectedSuperBlockElementAnchors[index],
       }
     });
@@ -149,43 +181,24 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
       path: props.state.currentSelectedElementAnchor,
     });
 
+    const WrapperDrawerElementTitle = props.WrapperDrawerElementTitle || DefaultWrapperDrawerElementTitle;
+
     titleForNode = entirePath.map((v, i) => {
       return (
-        <React.Fragment key={i}>
-          {
-            v.info.isInteractive ? (
-              <>
-                <Typography sx={[style.rtlonly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(9094)}</Typography>
-              </>
-            ) : null
-          }
-          <Typography
-            sx={i === entirePath.length - 1 ? [style.elementTitle, style.elementTitleSelected] : [style.elementTitle, style.elementTitleUnselected]}
-            role="button"
-            aria-current={i === entirePath.length - 1}
-            variant="h6"
-            onClick={i === entirePath.length - 1 ? null : props.helpers.selectPath.bind(null, v.path)}
-          >
-            {v.info.name}
-          </Typography>
-          {
-            v.info.isInteractive ? (
-              <>
-                <Typography sx={[style.ltronly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(9094)}</Typography>
-              </>
-            ) : null
-          }
-          {
-            i === entirePath.length - 1 ? null : (
-              <>
-                <Typography sx={[style.ltronly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(11106)}</Typography>
-                <Typography sx={[style.rtlonly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(11106)}</Typography>
-              </>
-            )
-          }
-        </React.Fragment>
+        <WrapperDrawerElementTitle
+          entirePath={entirePath as any}
+          info={v.info}
+          isCurrent={i === entirePath.length - 1}
+          key={i}
+          index={i}
+          onSelect={i === entirePath.length - 1 ? null : props.helpers.selectPath.bind(null, v.path)}
+        />
       );
     });
+
+    const WrapperDrawerInfoPanelWrapper = props.WrapperDrawerInfoPanelWrapper || DefaultWrapperDrawerInfoPanelWrapper;
+
+    const WrapperDrawerTabs = props.WrapperDrawerTabs || DefaultWrapperDrawerTabs;
 
     // and now we can build these settings
     // basically here we are building the divider and then
@@ -196,131 +209,60 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
         {
           !selectedNodeInfo.isText ?
             (
-              <>
-                <AltBadgeReactioner
-                  reactionKey="escape"
-                  label="esc"
-                  priority={3}
-                  disabled={!accessibilitySelectedOption}
-                  triggerAltAfterAction={true}
-                  fullWidth={true}
-                  tabbable={false}
-                  selector="div"
-                >
-                  <div onClick={useAccessibilitySelectedOption.bind(null, null)} />
-                </AltBadgeReactioner>
-                <Tabs
-                  value={location}
-                  onChange={setLocationCallback}
-                  onClick={forceOnClickEvent}
-                >
-                  <Tab
-                    sx={style.tab}
-                    label={
-                      <AltBadgeReactioner
-                        reactionKey="m"
-                        priority={2}
-                        disabled={!props.state.currentSelectedElement}
-                        selectorGoUp={1}
-                        triggerAltAfterAction={true}
-                      >
-                        <SettingsIcon />
-                      </AltBadgeReactioner>
+              <WrapperDrawerTabs
+                accessibilitySelectedOption={accessibilitySelectedOption as any}
+                selectedOption={location as any}
+                setSelectedOption={setLocationCallback}
+                setAccessibilitySelectedOption={useAccessibilitySelectedOption}
+                options={[
+                  {
+                    id: "MAIN",
+                    label: props.baseI18n.settings,
+                  },
+                  props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ? (
+                    {
+                      id: "STYLES",
+                      label: props.baseI18n.styles,
                     }
-                    value="MAIN"
-                    data-value="MAIN"
-                    title={props.i18nRichInfo.settings}
-                  />
-
-                  {
-                    props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
-                      (
-
-                        <Tab
-                          sx={style.tab}
-                          data-value="STYLES"
-                          label={
-                            <AltBadgeReactioner
-                              reactionKey="s"
-                              priority={2}
-                              disabled={!props.state.currentSelectedElement}
-                              selectorGoUp={1}
-                              triggerAltAfterAction={true}
-                            >
-                              <BorderStyleIcon />
-                            </AltBadgeReactioner>
-                          }
-                          value="STYLES"
-                          title={props.i18nRichInfo.styles}
-                        />
-                      ) :
-                      null
-                  }
-                  {
-                    (props.featureSupport.supportsTemplating) ?
-                      (
-                        <Tab
-                          sx={style.tab}
-                          label={
-                            <AltBadgeReactioner
-                              reactionKey="t"
-                              priority={2}
-                              disabled={!props.state.currentSelectedElement}
-                              selectorGoUp={1}
-                              triggerAltAfterAction={true}
-                            >
-                              <WebIcon />
-                            </AltBadgeReactioner>
-                          }
-                          value="TEMPLATING"
-                          data-value="TEMPLATING"
-                          title={props.i18nRichInfo.templating}
-                        />
-                      ) :
-                      null
-                  }
-                  {
-                    (props.featureSupport.supportsTemplating) ?
-                      (
-                        <Tab
-                          sx={style.tab}
-                          label={
-                            <AltBadgeReactioner
-                              reactionKey="a"
-                              priority={2}
-                              disabled={!props.state.currentSelectedElement}
-                              selectorGoUp={1}
-                              triggerAltAfterAction={true}
-                            >
-                              <TouchAppIcon />
-                            </AltBadgeReactioner>
-                          }
-                          value="ACTIONS"
-                          data-value="ACTIONS"
-                          title={props.i18nRichInfo.actions}
-                        />
-                      ) :
-                      null
-                  }
-                </Tabs>
-              </>
+                  ) : null,
+                  props.featureSupport.supportsTemplating ? (
+                    {
+                      id: "TEMPLATING",
+                      label: props.baseI18n.templating,
+                    }
+                  ) : null,
+                  props.featureSupport.supportsTemplating ? (
+                    {
+                      id: "ACTIONS",
+                      label: props.baseI18n.actions,
+                    }
+                  ) : null,
+                ].filter((v) => !!v)}
+              />
             ) : null
         }
-        <AltPriorityShifter amount={!accessibilitySelectedOption ? -100 : 0}>
+        <WrapperDrawerInfoPanelWrapper
+          accessibilitySelectedOption={accessibilitySelectedOption as any}
+          selectedOption={location as any}
+          setSelectedOption={setLocationCallback}
+          setAccessibilitySelectedOption={useAccessibilitySelectedOption}
+        >
           {infoPanel}
-        </AltPriorityShifter>
+        </WrapperDrawerInfoPanelWrapper>
       </>
     );
   }
 
+  const WrapperForTitle = props.WrapperDrawerElementTitleWrapper || DefaultWrapperDrawerElementTitleWrapper;
+
   // now we return
   return (
     <>
-      <Box sx={style.elementTitleContainer}>
+      <WrapperForTitle>
         {titleForNode}
-      </Box>
+      </WrapperForTitle>
       {settingsForNode}
-      <AltSectionScroller priority={1} positioning="absolute" />
+      {props.drawerExtraChildren}
     </>
   );
 }

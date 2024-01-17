@@ -13,12 +13,13 @@ import { IHelperFunctions, ISlateEditorInternalStateType, ISlateEditorWrapperBas
 
 import { Path, Range } from "slate";
 import { RichElement } from "../../serializer";
-// import { WrapperDrawer } from "./drawer";
-// import { FileLoadErrorDialog } from "./dialogs/file";
+import { WrapperDrawer } from "./drawer";
+import { FileLoadErrorDialog, IDialogComponentProps } from "./dialogs/file";
 import ReactDOM from "react-dom";
 import { countSizeAndWords } from "../../util";
 import { STANDARD_TEXT_NODE } from "../../serializer/types/text";
 import { IBaseI18nRichTextInfo, defaultBaseI18nRichInfoEnglish } from ".";
+import { IWrapperDrawerElementTitleProps, IWrapperDrawerInfoPanelWrapperProps, IWrapperDrawerTabsProps } from "./drawer";
 
 export const defaultWrapperI18nRichInfoEnglish: IWrapperI18nRichTextInfo = {
   ...defaultBaseI18nRichInfoEnglish,
@@ -502,6 +503,44 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
    * These are select elements for options when using template settings
    */
   DrawerSingleTemplatingElement?: React.ComponentType<IDrawerSingleTemplatingElementProps>;
+
+  /**
+   * Used for displaying dialogs with errors
+   */
+  Dialog?: React.ComponentType<IDialogComponentProps>;
+
+  /**
+   * Used for generating the title and hirearchy of each element in the drawer
+   */
+  WrapperDrawerElementTitle?: React.ComponentType<IWrapperDrawerElementTitleProps>;
+
+  /**
+   * Used for wrapping all the titles generated
+   */
+  WrapperDrawerElementTitleWrapper?: React.ComponentType<{children: React.ReactNode}>;
+
+  /**
+   * Wraps the information panel from the drawer, whatever is visible
+   */
+  WrapperDrawerInfoPanelWrapper?: React.ComponentType<IWrapperDrawerInfoPanelWrapperProps>;
+
+  /**
+   * Used for the tabs switcher component that is used in the drawer
+   */
+  WrapperDrawerTabs?: React.ComponentType<IWrapperDrawerTabsProps>;
+
+  /**
+   * add extra children to the drawer
+   */
+  drawerExtraChildren?: React.ReactNode;
+}
+
+function DefaultEditorContainer(props: IEditorContainerProps) {
+  return (
+    <div className="slateEditorDefaultEditorContainer">
+      {props.children}
+    </div>
+  );
 }
 
 export interface IDrawerTemplatingContainerBoxProps {
@@ -1944,21 +1983,21 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
 
     // the file load error dialog that shows an error
     // based on the current load error
-    // TODO
-    // const fileLoadErrorDialog =
-    //   this.props.state.isRichText &&
-    //     (
-    //       this.props.featureSupport.supportsImages ||
-    //       this.props.featureSupport.supportsFiles
-    //     ) ?
-    //     (
-    //       <FileLoadErrorDialog
-    //         currentLoadError={this.props.currentLoadError}
-    //         dismissCurrentLoadError={this.props.dismissCurrentLoadError}
-    //         i18nGenericError={this.props.i18nGenericError}
-    //         i18nOk={this.props.i18nOk}
-    //       />
-    //     ) : null;
+    const fileLoadErrorDialog =
+      this.props.state.isRichText &&
+        (
+          this.props.featureSupport.supportsImages ||
+          this.props.featureSupport.supportsFiles
+        ) ?
+        (
+          <FileLoadErrorDialog
+            currentLoadError={this.props.currentLoadError}
+            dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+            i18nGenericError={(this.props.baseI18n as IWrapperI18nRichTextInfo).genericError}
+            i18nOk={(this.props.baseI18n as IWrapperI18nRichTextInfo).ok}
+            Dialog={this.props.Dialog}
+          />
+        ) : null;
 
     let toolbar = (
       <RichTextEditorToolbar
@@ -1993,7 +2032,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
     );
 
     const DisjointedEditorContainer = this.props.DisjointedEditorContainer || "div";
-    const EditorContainer = this.props.EditorContainer || "div";
+    const EditorContainer = this.props.EditorContainer || DefaultEditorContainer;
     const DisjointedEditor = this.props.DisjointedEditor || "div";
     const Editor = this.props.Editor || "div";
 
@@ -2205,7 +2244,7 @@ function DefaultDrawerContainerBox(props: IDrawerContainerBoxProps) {
       className={
         (props.drawerOpen ? "open " : "") +
         (props.disjointedMode ? "slateEditorDrawerFixed" : "slateEditorDrawer") +
-        (props.noAnimate ? "slateEditorDrawerNoAnimate" : null)
+        (props.noAnimate ? " slateEditorDrawerNoAnimate" : "")
       }
     >
       {props.children}
@@ -2262,8 +2301,7 @@ class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerCont
           toolbarHeight={this.props.toolbarHeight}
           drawerOpen={this.props.drawerOpen}
         >
-          {null}
-          {/* <WrapperDrawer {...this.props} TODO/> */}
+          <WrapperDrawer {...this.props}/>
         </DrawerBody>
       </DrawerContainerBox>
     );
