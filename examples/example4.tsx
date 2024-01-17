@@ -55,7 +55,7 @@ function Example() {
 
   return (
     <div>
-      <h1>Using UI Handlers</h1>
+      <h1>Basic Editing</h1>
 
       <section>
         <h4>

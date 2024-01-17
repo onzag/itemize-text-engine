@@ -72,7 +72,7 @@
 html[dir=rtl] .rich-text ul li {
   padding-right: 0;
 }
-html[dir=ltr] .rich-text ul li {
+html[dir=ltr] .rich-text ul li, html:not([dir]) .rich-text ul li {
   padding-left: 0;
 }
 .rich-text ul li::before {
@@ -86,14 +86,14 @@ html[dir=rtl] .rich-text ul li::before {
   margin-right: 1rem;
   margin-left: 0.5rem;
 }
-html[dir=ltr] .rich-text ul li::before {
+html[dir=ltr] .rich-text ul li::before, html:not([dir]) .rich-text ul li::before {
   margin-left: 1rem;
   margin-right: 0.5rem;
 }
 html[dir=rtl] .rich-text ul li > * {
   padding-right: 2.5rem;
 }
-html[dir=ltr] .rich-text ul li > * {
+html[dir=ltr] .rich-text ul li > *, html:not([dir]) .rich-text ul li > * {
   padding-left: 2.5rem;
 }
 .rich-text ul li > ul > li::before {
@@ -109,7 +109,7 @@ html[dir=ltr] .rich-text ul li > * {
 html[dir=rtl] .rich-text ol li {
   padding-right: 0;
 }
-html[dir=ltr] .rich-text ol li {
+html[dir=ltr] .rich-text ol li, html:not([dir]) .rich-text ol li {
   padding-left: 0;
 }
 .rich-text ol li {
@@ -127,7 +127,7 @@ html[dir=rtl] .rich-text ol li::before {
   text-align: left;
   direction: ltr;
 }
-html[dir=ltr] .rich-text ol li::before {
+html[dir=ltr] .rich-text ol li::before, html:not([dir]) .rich-text ol li::before {
   margin-right: 0.5rem;
   text-align: right;
   direction: rtl;
@@ -135,7 +135,7 @@ html[dir=ltr] .rich-text ol li::before {
 html[dir=rtl] .rich-text ol li > * {
   padding-right: 2.5rem;
 }
-html[dir=ltr] .rich-text ol li > * {
+html[dir=ltr] .rich-text ol li > *, html:not([dir]) .rich-text ol li > * {
   padding-left: 2.5rem;
 }
 .rich-text blockquote {
@@ -151,7 +151,7 @@ html[dir=rtl] .rich-text blockquote {
   padding: 1.2rem 50px 1.2rem 30px;
   border-right: 8px solid #26a69a;
 }
-html[dir=ltr] .rich-text blockquote {
+html[dir=ltr] .rich-text blockquote, html:not([dir]) .rich-text blockquote {
   padding: 1.2rem 30px 1.2rem 50px;
   border-left: 8px solid #26a69a;
 }
@@ -166,7 +166,7 @@ html[dir=ltr] .rich-text blockquote {
 html[dir=rtl] .rich-text blockquote::before {
   right: 10px;
 }
-html[dir=ltr] .rich-text blockquote::before {
+html[dir=ltr] .rich-text blockquote::before, html:not([dir]) .rich-text blockquote::before {
   left: 10px;
 }
 .rich-text blockquote::after {
@@ -188,12 +188,17 @@ html[dir=rtl] .rich-text h5,
 html[dir=rtl] .rich-text h6 {
   text-align: right;
 }
-html[dir=ltr] .rich-text h1,
+html[dir=ltr] .rich-text h1, html:not([dir]) .rich-text h1,
 html[dir=ltr] .rich-text h2,
+html:not([dir]) .rich-text h2,
 html[dir=ltr] .rich-text h3,
+html:not([dir]) .rich-text h3,
 html[dir=ltr] .rich-text h4,
+html:not([dir]) .rich-text h4,
 html[dir=ltr] .rich-text h5,
-html[dir=ltr] .rich-text h6 {
+html:not([dir]) .rich-text h5,
+html[dir=ltr] .rich-text h6,
+html:not([dir]) .rich-text h6 {
   text-align: left;
 }
 .rich-text h1 {

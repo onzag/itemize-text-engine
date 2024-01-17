@@ -103,7 +103,7 @@ $superblock-highlight-color: #33691e;
         padding-right: 0;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         padding-left: 0;
       }
     }
@@ -120,7 +120,7 @@ $superblock-highlight-color: #33691e;
         margin-left: 0.5rem;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         margin-left: 1rem;
         margin-right: 0.5rem;
       }
@@ -131,7 +131,7 @@ $superblock-highlight-color: #33691e;
         padding-right: 2.5rem;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         padding-left: 2.5rem;
       }
     }
@@ -154,7 +154,7 @@ $superblock-highlight-color: #33691e;
         padding-right: 0;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         padding-left: 0;
       }
     }
@@ -176,7 +176,7 @@ $superblock-highlight-color: #33691e;
         direction: ltr;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         margin-right: 0.5rem;
         text-align: right;
         direction: rtl;
@@ -188,7 +188,7 @@ $superblock-highlight-color: #33691e;
         padding-right: 2.5rem;
       }
 
-      html[dir="ltr"] & {
+      html[dir="ltr"] &, html:not([dir]) & {
         padding-left: 2.5rem;
       }
     }
@@ -208,7 +208,7 @@ $superblock-highlight-color: #33691e;
       border-right: 8px solid $quote-highlight-color;
     }
 
-    html[dir="ltr"] & {
+    html[dir="ltr"] &, html:not([dir]) & {
       padding: 1.2rem 30px 1.2rem 50px;
       border-left: 8px solid $quote-highlight-color;
     }
@@ -226,7 +226,7 @@ $superblock-highlight-color: #33691e;
       right: 10px;
     }
 
-    html[dir="ltr"] & {
+    html[dir="ltr"] &, html:not([dir]) & {
       left: 10px;
     }
   }
@@ -247,7 +247,7 @@ $superblock-highlight-color: #33691e;
       text-align: right;
     }
 
-    html[dir="ltr"] & {
+    html[dir="ltr"] &, html:not([dir]) & {
       text-align: left;
     }
   }
