@@ -14,11 +14,177 @@ import { IHelperFunctions, ISlateEditorInternalStateType, ISlateEditorWrapperBas
 import { Path, Range } from "slate";
 import { RichElement } from "../../serializer";
 // import { WrapperDrawer } from "./drawer";
-import { FileLoadErrorDialog } from "./dialogs/file";
+// import { FileLoadErrorDialog } from "./dialogs/file";
 import ReactDOM from "react-dom";
 import { countSizeAndWords } from "../../util";
 import { STANDARD_TEXT_NODE } from "../../serializer/types/text";
-import { IPropertyEntryI18nRichTextInfo } from "..";
+import { IBaseI18nRichTextInfo, defaultBaseI18nRichInfoEnglish } from ".";
+
+export const defaultWrapperI18nRichInfoEnglish: IWrapperI18nRichTextInfo = {
+  ...defaultBaseI18nRichInfoEnglish,
+  formatAddContainerLabel: "add container",
+  addTemplateHTML: {
+    label: "select a template",
+    placeholder: "select a template",
+    submit: "ok",
+    title: "add template html",
+  },
+  addTemplateText: {
+    label: "select a template",
+    placeholder: "select a template",
+    submit: "ok",
+    title: "add template text",
+  },
+  formatAddCustomLabel: "add custom",
+  formatAddFileLabel: "add file",
+  formatAddImageLabel: "add image",
+  formatAddTableLabel: "add table",
+  formatAddTbodyLabel: "add table body",
+  formatAddTdLabel: "add table column",
+  formatAddTemplateHTML: "add template html",
+  formatAddTemplateText: "add template text",
+  formatAddTfootLabel: "add table foot",
+  formatAddTheadLabel: "add table head",
+  formatAddThLabel: "add table header column",
+  formatAddTrLabel: "add table row",
+  formatAddVideoLabel: "add table video",
+  formatBoldLabel: "bold",
+  formatDeleteElement: "delete",
+  formatDelTdLabel: "delete table column",
+  formatDelThLabel: "delete table header column",
+  formatDelTrLabel: "delete table row",
+  formatItalicLabel: "italic",
+  formatLinkLabel: "link",
+  formatListBulletedLabel: "bulleted list",
+  formatListNumberedLabel: "numbered list",
+  formatMakeLoop: "make loop",
+  formatMore: "more",
+  formatQuoteLabel: "quote",
+  formatSetActiveStyleLabel: "active style",
+  formatSetClassLabel: "class names",
+  formatSetContext: "set context",
+  formatSetEventHandlers: "set event handlers",
+  formatSetHoverStyleLabel: "hover style",
+  formatSetRenderCondition: "set render condition",
+  formatSetStyleLabel: "set style",
+  formatSetUIHandlerArgLabel: "set ui handler arg",
+  formatSetUIHandlerArgName: "set ui handler arg name",
+  formatSetUIHandlerArgValue: "set ui handler arg value",
+  formatSetUIHandlerLabel: "set ui handler",
+  formatTitleLabel: "title",
+  formatUnderlineLabel: "underline",
+  loadVideo: {
+    invalid: "invalid url",
+    label: "youtube and vimeo only",
+    placeholder: "https://youtube.com/...",
+    submit: "insert",
+    title: "insert a video",
+  },
+  setLink: {
+    invalid: "invalid link",
+    label: "url",
+    placeholder: "https://url",
+    placeholderLocalOnly: "./local-url-only",
+    submit: "ok",
+    templated: "or select one of these template values",
+    templatedLabel: "template value",
+    templatedPlaceholder: "template value",
+    templatedUnspecified: "unspecified",
+    title: "insert a link,"
+  },
+  genericError: "error",
+  ok: "ok",
+}
+
+/**
+ * The rich text information
+ * to be used to build an editor and describe
+ * a node
+ * 
+ * check basicI18nRichInfoEnglish to see how it is done
+ * some of these elements are setup with a number {0}
+ * due to itemize's localization and the way it's done
+ * in its localization files, here you have to do by code
+ */
+export interface IWrapperI18nRichTextInfo extends IBaseI18nRichTextInfo {
+  formatBoldLabel: string;
+  formatItalicLabel: string;
+  formatUnderlineLabel: string;
+  formatLinkLabel: string;
+  formatTitleLabel: string;
+  formatQuoteLabel: string;
+  formatListNumberedLabel: string;
+  formatListBulletedLabel: string;
+  formatAddImageLabel: string;
+  formatAddVideoLabel: string;
+  formatAddFileLabel: string;
+  formatAddContainerLabel: string;
+  formatAddTableLabel: string;
+  formatAddTheadLabel: string;
+  formatAddTbodyLabel: string;
+  formatAddTfootLabel: string;
+  formatAddTrLabel: string;
+  formatAddTdLabel: string;
+  formatAddThLabel: string;
+  formatDelTrLabel: string;
+  formatDelTdLabel: string;
+  formatDelThLabel: string;
+  formatAddCustomLabel: string;
+  formatSetStyleLabel: string;
+  formatSetHoverStyleLabel: string;
+  formatSetActiveStyleLabel: string;
+  formatSetClassLabel: string;
+  formatSetEventHandlers: string;
+  formatSetContext: string;
+  formatSetRenderCondition: string;
+  formatMakeLoop: string;
+  formatSetUIHandlerLabel: string;
+  formatSetUIHandlerArgLabel: string;
+  formatSetUIHandlerArgName: string;
+  formatSetUIHandlerArgValue: string;
+  formatAddTemplateText: string;
+  formatAddTemplateHTML: string;
+  formatDeleteElement: string;
+  formatMore: string;
+
+  loadVideo: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    title: string;
+    submit: string;
+  };
+
+  setLink: {
+    invalid: string;
+    label: string;
+    placeholder: string;
+    placeholderLocalOnly: string;
+    templated: string;
+    templatedLabel: string;
+    templatedPlaceholder: string;
+    templatedUnspecified: string;
+    title: string;
+    submit: string;
+  };
+
+  addTemplateText: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
+
+  addTemplateHTML: {
+    title: string;
+    label: string;
+    placeholder: string;
+    submit: string;
+  };
+
+  genericError: string;
+  ok: string;
+}
 
 type RichElementFn = () => RichElement;
 
@@ -205,18 +371,6 @@ export type SlateEditorWrapperCustomToolbarElement =
  * when the editor is created with the wrapper itself
  */
 export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps {
-  /**
-   * A generic error message
-   */
-  i18nGenericError: string;
-  /**
-   * A generic ok
-   */
-  i18nOk: string;
-  /**
-   * The whole of the i18n rich information that is given by default
-   */
-  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
   /**
    * Function that should be specified to assign extra toolbar elements
    * to be used either by ui handled components and whatnot
@@ -569,7 +723,7 @@ function Bold(props: RichTextEditorToolbarElementProps) {
   const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatBoldLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatBoldLabel}
       disabled={disabled}
       selected={props.state.currentSelectedText && props.state.currentSelectedText.bold}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.formatToggle, "bold")}
@@ -585,7 +739,7 @@ function Italic(props: RichTextEditorToolbarElementProps) {
   const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatItalicLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatItalicLabel}
       disabled={disabled}
       selected={props.state.currentSelectedText && props.state.currentSelectedText.italic}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.formatToggle, "italic")}
@@ -601,7 +755,7 @@ function Underline(props: RichTextEditorToolbarElementProps) {
   const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatUnderlineLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatUnderlineLabel}
       disabled={disabled}
       selected={props.state.currentSelectedText && props.state.currentSelectedText.underline}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.formatToggle, "underline")}
@@ -684,7 +838,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
 
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatLinkLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatLinkLabel}
       selected={selected}
       disabled={disabled}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.toggleLink, null, null)}
@@ -705,7 +859,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatTitleLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatTitleLabel}
       disabled={disabled}
       selected={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "title"}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.toggleTitle, "h1")}
@@ -725,7 +879,7 @@ function Quote(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatQuoteLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatQuoteLabel}
       disabled={disabled}
       selected={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "quote"}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.toggleQuote)}
@@ -746,7 +900,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatListNumberedLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatListNumberedLabel}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertList, "numbered")}
@@ -766,7 +920,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatListBulletedLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatListBulletedLabel}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertList, "bulleted")}
@@ -801,7 +955,7 @@ function Image(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddImageLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddImageLabel}
       disabled={disabled}
       selected={false}
       onClick={props.requestImage}
@@ -830,7 +984,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddVideoLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddVideoLabel}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertVideo, null)}
@@ -862,7 +1016,7 @@ function File(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddFileLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddFileLabel}
       disabled={disabled}
       selected={false}
       onClick={props.requestFile}
@@ -884,7 +1038,7 @@ function Container(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddContainerLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddContainerLabel}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertContainer, null)}
@@ -906,7 +1060,7 @@ function Table(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddTableLabel}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTableLabel}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertTable, null)}
@@ -964,7 +1118,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddTemplateText}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTemplateText}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertTemplateText, null, null)}
@@ -1031,7 +1185,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
   const ToolbarButton = props.ToolbarButton || DefaultToolbarButtonComponent;
   return (
     <ToolbarButton
-      title={props.i18nRichInfo.formatAddTemplateHTML}
+      title={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTemplateHTML}
       disabled={disabled}
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertTemplateHTML, null, null)}
@@ -1790,20 +1944,21 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
 
     // the file load error dialog that shows an error
     // based on the current load error
-    const fileLoadErrorDialog =
-      this.props.state.isRichText &&
-        (
-          this.props.featureSupport.supportsImages ||
-          this.props.featureSupport.supportsFiles
-        ) ?
-        (
-          <FileLoadErrorDialog
-            currentLoadError={this.props.currentLoadError}
-            dismissCurrentLoadError={this.props.dismissCurrentLoadError}
-            i18nGenericError={this.props.i18nGenericError}
-            i18nOk={this.props.i18nOk}
-          />
-        ) : null;
+    // TODO
+    // const fileLoadErrorDialog =
+    //   this.props.state.isRichText &&
+    //     (
+    //       this.props.featureSupport.supportsImages ||
+    //       this.props.featureSupport.supportsFiles
+    //     ) ?
+    //     (
+    //       <FileLoadErrorDialog
+    //         currentLoadError={this.props.currentLoadError}
+    //         dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+    //         i18nGenericError={this.props.i18nGenericError}
+    //         i18nOk={this.props.i18nOk}
+    //       />
+    //     ) : null;
 
     let toolbar = (
       <RichTextEditorToolbar
@@ -1823,7 +1978,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
 
     let extraChildren: React.ReactNode = null;
     if (this.props.customExtraChildren) {
-      const [characterCount, wordCount] = countSizeAndWords(this.props.state.currentValue);
+      const [characterCount, wordCount] = countSizeAndWords(this.props.state.treeValue);
       extraChildren = this.props.customExtraChildren(characterCount, wordCount);
     }
 
@@ -1915,7 +2070,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
           {toolbar}
           {box}
           {drawerContainer}
-          {fileLoadErrorDialog}
+          {/* {fileLoadErrorDialogTODO} */}
           {imageInput}
           {fileInput}
         </>
@@ -1928,7 +2083,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
             {box}
             {drawerContainer}
           </EditorContainer>
-          {fileLoadErrorDialog}
+          {/* {fileLoadErrorDialogTODO} */}
           {imageInput}
           {fileInput}
         </>
@@ -2107,7 +2262,8 @@ class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerCont
           toolbarHeight={this.props.toolbarHeight}
           drawerOpen={this.props.drawerOpen}
         >
-          {/* <WrapperDrawer {...this.props} /> */}
+          {null}
+          {/* <WrapperDrawer {...this.props} TODO/> */}
         </DrawerBody>
       </DrawerContainerBox>
     );

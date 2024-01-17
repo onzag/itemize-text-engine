@@ -7,6 +7,8 @@ import { MutatingTemplateArgs, TemplateArgs } from "../serializer/template-args"
 import { IParagraph } from "../serializer/types/paragraph";
 import { IImage } from "../serializer/types/image";
 import { IUIHandlerProps } from "../serializer/base";
+import { SlateEditor, defaultBaseI18nRichInfoEnglish } from "../editor/slate";
+import { DefaultSlateWrapper, defaultWrapperI18nRichInfoEnglish } from "../editor/slate/wrapper";
 
 const featureSupportBasic: IFeatureSupportOptions = {
   supportedContainers: [],
@@ -18,6 +20,7 @@ const featureSupportBasic: IFeatureSupportOptions = {
   supportsCustomStyles: true,
   supportsExternalLinks: true,
   // we will disable both files and images
+  // for now
   supportsFiles: false,
   supportsFilesAccept: null,
   supportsImages: false,
@@ -27,59 +30,141 @@ const featureSupportBasic: IFeatureSupportOptions = {
   supportsQuote: true,
   supportsRichClasses: true,
   supportsTables: true,
-  // we will also disable templating
-  supportsTemplating: false,
+  supportsTemplating: true,
   supportsTitle: true,
   supportsVideos: true,
 };
 
-// We will start with an empty value, normally we would need to sanitize but this isn't necessary
-// right now
+// We will start with an empty value
 const TEXT_FROM_SERVER_1 = '';
 
+// we sanitize, it will do nothing in this
+// case
 const sanitized1 = sanitize({
   fileResolver: null,
 }, featureSupportBasic, TEXT_FROM_SERVER_1);
 
 const textTree1 = deserialize(sanitized1);
 
-// UI Handlers can also play with all the other features defined before, however they need to be specified manually
-// for example the styleActive and styleHover properties need to be set manually since the component
-// is ui handled by itself, even props.events are included
-
 function Example() {
+  // our initial value is the same as the sanitized
+  // this value is for convenience is not what is used
+  // for the state of the editor but the tree is
+  const [htmlValue, setHtmlValue] = useState(sanitized1);
+  const [treeValue, setTreeValue] = useState(textTree1);
+
   return (
     <div>
       <h1>Using UI Handlers</h1>
 
       <section>
         <h4>
-          Basic UI Handler to have input fields
+          Basic Editor (Unstyled) (No Wrapper) (No Element Wrappers)
         </h4>
-        <div>
-          Original HTML (also sanitized):
+        <div style={{ border: "solid 1px #ccc" }}>
+          <SlateEditor
+            id="my-editor"
+
+            // this is regarging file loading
+            // we have disabled files and images so this shouldn't happen
+            currentLoadError={null}
+            dismissCurrentLoadError={null}
+            onInsertFile={null}
+            onInsertFileFromURL={null}
+            onRetrieveFile={null}
+            onRetrieveImage={null}
+            supportedImageTypes={null}
+
+            // this validity is done via another criteria
+            // of your choosing
+            currentValid={true}
+            treeValue={treeValue}
+            value={htmlValue}
+
+            // we feed it the same feature support we used
+            features={featureSupportBasic}
+            isRichText={textTree1.rich}
+            // the given language
+            lang="en"
+
+            onChange={(value, textTreeValue) => {
+              setHtmlValue(value);
+              setTreeValue(textTreeValue);
+            }}
+
+            // this is used to define a root context
+            // used for templating, to determine
+            // the shape of the context that will be feed
+            rootContext={null}
+
+            // this is used to feed it language information
+            baseI18n={defaultBaseI18nRichInfoEnglish}
+          />
         </div>
-        <code>{TEXT_FROM_SERVER_1}</code>
-        <div>
-          rendered template dinamically (react component)
-        </div>
-        <div className="rich-text" style={{ padding: "10px", border: "solid 1px #ccc" }}>{rendered1}</div>
       </section>
 
       <section>
         <h4>
-          Basic UI Handler that contains UI handlers and contains content within the handler
+          Basic Editor (Unstyled) (No Element Wrappers)
         </h4>
-        <div>
-          Original HTML (also sanitized):
+        <div style={{ border: "solid 1px #ccc" }}>
+          <SlateEditor
+            id="my-editor"
+
+            // this is regarging file loading
+            // we have disabled files and images so this shouldn't happen
+            currentLoadError={null}
+            dismissCurrentLoadError={null}
+            onInsertFile={null}
+            onInsertFileFromURL={null}
+            onRetrieveFile={null}
+            onRetrieveImage={null}
+            supportedImageTypes={null}
+
+            // this validity is done via another criteria
+            // of your choosing
+            currentValid={true}
+            treeValue={treeValue}
+            value={htmlValue}
+
+            // we feed it the same feature support we used
+            features={featureSupportBasic}
+            isRichText={textTree1.rich}
+            // the given language
+            lang="en"
+
+            onChange={(value, textTreeValue) => {
+              setHtmlValue(value);
+              setTreeValue(textTreeValue);
+            }}
+
+            // this is used to define a root context
+            // used for templating, to determine
+            // the shape of the context that will be feed
+            rootContext={null}
+
+            // The wrapper wraps the editor and brings extra functionality
+            // the default wrapper brings a toolbar and a config drawer
+            // which is highly customizable,
+            // the configuration is done via wrapperArgs prop
+            // and is passed as props to the default wrapper
+            // sadly these props are arbitrary and as a result
+            // there's no typescript autocompletition, as anyone can write a wrapper
+            // the default isn't pretty at all, and you should try to configure it to have the same
+            // look and feel as your app, in itemize fast prototyping it is reconfigured to use material UI
+            Wrapper={DefaultSlateWrapper}
+            // note how we changed this to use the one that has more details
+            // which are necessary for the wrapper to function
+            baseI18n={defaultWrapperI18nRichInfoEnglish}
+          />
         </div>
-        <code>{TEXT_FROM_SERVER_2}</code>
-        <div>
-          rendered template dinamically (react component)
-        </div>
-        <div className="rich-text" style={{ padding: "10px", border: "solid 1px #ccc" }}>{rendered2}</div>
       </section>
-    </div>
+
+      <section>
+        <code>{htmlValue}</code>
+        <code>{JSON.stringify(treeValue, null, 2)}</code>
+      </section>
+    </div >
   );
 }
 

@@ -231,7 +231,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
   const currentSelectElementForSelectContext = getContextFor(
     props.state.currentSelectedElementAnchor,
     "select-context",
-    props.state.currentValue,
+    props.state.treeValue,
     props.state.currentRootContext,
   );
   if (currentSelectElementForSelectContext) {
@@ -256,7 +256,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
   const currentSelectElementForEachContext = getContextFor(
     props.state.currentSelectedElementAnchor,
     "select-loop",
-    props.state.currentValue,
+    props.state.treeValue,
     props.state.currentRootContext,
   );
   // if we have a context, otherwise without context there are no options
@@ -321,7 +321,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
     <DrawerTemplatingContainerBox>
       <SingleTemplatingElement
         name="context"
-        i18nName={props.i18nRichInfo.context}
+        i18nName={props.baseI18n.context}
         value={currentNode.context || null}
         options={allContexts}
         anchor={props.state.currentSelectedElementAnchor}
@@ -330,7 +330,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
       />
       <SingleTemplatingElement
         name="if"
-        i18nName={props.i18nRichInfo.renderCondition}
+        i18nName={props.baseI18n.renderCondition}
         value={currentNode.ifCondition || null}
         options={allIfConditions}
         anchor={props.state.currentSelectedElementAnchor}
@@ -339,7 +339,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
       />
       <SingleTemplatingElement
         name="each"
-        i18nName={props.i18nRichInfo.each}
+        i18nName={props.baseI18n.each}
         value={currentNode.forEach || null}
         options={allEachContexts}
         anchor={props.state.currentSelectedElementAnchor}

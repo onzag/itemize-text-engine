@@ -36,6 +36,113 @@ import { CONTAINER_CLASS_PREFIX, CUSTOM_CLASS_PREFIX, IFeatureSupportOptions, RI
 import { countSize } from "../../util";
 import { localeReplacer, mimeTypeToExtension } from "..";
 
+export const defaultBaseI18nRichInfoEnglish: IBaseI18nRichTextInfo = {
+  actions: "actions",
+  alt: "alt",
+  classes: "classes",
+  container: "container",
+  context: "context",
+  custom: "custom",
+  each: "loop for each",
+  file: "file",
+  image: "image",
+  inline: "inline",
+  interactive: "interactive {0}",
+  link: "link",
+  list: "list",
+  listItem: "list item",
+  name: "name",
+  paragraph: "paragraph",
+  quote: "quote",
+  renderCondition: "render condition",
+  richClasses: {},
+  richContainers: {},
+  richCustoms: {},
+  richTables: {},
+  richUIHandlerElement: {},
+  settings: "settings",
+  sizes: "sizes",
+  standalone: "standalone",
+  style: "style",
+  styleActive: "style active",
+  styleHover: "style hover",
+  styled: "styled {0}",
+  styles: "styles",
+  table: "table",
+  tbody: "table body",
+  td: "table column",
+  template: "template {0}",
+  templating: "templating",
+  text: "text",
+  tfoot: "table footer",
+  th: "table column",
+  thead: "table head",
+  title: "title",
+  tr: "table row",
+  type: "type",
+  uiHandler: "ui handler",
+  video: "video",
+}
+
+export interface IBaseI18nRichTextInfo {
+  name: string;
+  alt: string;
+  sizes: string;
+  container: string;
+  inline: string;
+  text: string;
+  custom: string;
+  file: string;
+  image: string;
+  link: string;
+  list: string;
+  listItem: string;
+  paragraph: string;
+  quote: string;
+  title: string;
+  table: string;
+  thead: string;
+  tbody: string;
+  tfoot: string;
+  tr: string;
+  td: string;
+  th: string;
+  video: string;
+  styled: string;
+  template: string;
+  interactive: string;
+  style: string;
+  styleActive: string;
+  styleHover: string;
+  classes: string;
+  settings: string;
+  styles: string;
+  templating: string;
+  actions: string;
+  each: string;
+  context: string;
+  renderCondition: string;
+  uiHandler: string;
+  type: string;
+  standalone: string;
+
+  richUIHandlerElement: {
+    [key: string]: string;
+  };
+  richTables: {
+    [key: string]: string;
+  };
+  richContainers: {
+    [key: string]: string;
+  };
+  richClasses: {
+    [key: string]: string;
+  };
+  richCustoms: {
+    [key: string]: string;
+  };
+}
+
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor;
@@ -771,7 +878,7 @@ export interface ISlateEditorInternalStateType {
    * The current value from the document that is used
    * in the slate rich text editor
    */
-  currentValue: IRootLevelDocument;
+  treeValue: IRootLevelDocument;
 
   /**
    * Contextual, very specific to the current context
@@ -890,6 +997,10 @@ export interface ISlateEditorWrapperBaseProps {
    * as the currentLoadError
    */
   dismissCurrentLoadError: () => void;
+  /**
+   * the base i18n given
+   */
+  baseI18n: IBaseI18nRichTextInfo;
 }
 
 /**
@@ -958,7 +1069,7 @@ interface ISlateEditorProps {
   /**
    * Args passed to all the element wrappers
    */
-  elementWrappersArgs: any;
+  elementWrappersArgs?: any;
 
   /**
    * The list of standard features that are supported
@@ -1007,10 +1118,12 @@ interface ISlateEditorProps {
    */
   rootContext: ITemplateArgContextDefinition;
   /**
-   * The root i18n, renderers have a way to receive the root i18n data
-   * based on the property definition they are using
+   * The base i18n, this will be passed to the wrapper
+   * the wrapper may require more information
+   * so it is recommended that you check how the wrapper handles its
+   * needs
    */
-  rootI18n: any;
+  baseI18n: IBaseI18nRichTextInfo;
   /**
    * Whether the value represents rich text, given the value is
    * a string, this editor must know how to parse it
@@ -1022,22 +1135,22 @@ interface ISlateEditorProps {
    * it might be null if this value
    * is unknown
    */
-  currentValue: IRootLevelDocument;
+  treeValue: IRootLevelDocument;
   /**
    * Triggers on change, it is meant to keep the same shape
    * as the handler expects it
    */
-  onChange: (value: string, currentValue: IRootLevelDocument) => void;
+  onChange: (value: string, treeValue: IRootLevelDocument) => void;
   /**
    * Triggers on focus, it can be used to customize the renderer that is created
    * using it
    */
-  onFocus: () => void;
+  onFocus?: () => void;
   /**
    * Triggers on blur, it can be used to customize the renderer that is created
    * using it
    */
-  onBlur: () => void;
+  onBlur?: () => void;
   /**
    * Function that usually comes from the handler and is provided via the renderer
    * directly to this in order to handle file insertions into the media property
@@ -1099,7 +1212,7 @@ interface ISlateEditorState extends ISlateEditorInternalStateType {
    * using the serializer functions in the utilities in order
    * to obtain this internal value
    */
-  currentValue: IRootLevelDocument;
+  treeValue: IRootLevelDocument;
   /**
    * Whether the internal value is synced or should be synced, because the rich
    * text editor is rather complex, sending updates all the time and refetching from
@@ -1227,18 +1340,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // now if we have an internal value that is given via the props
       // this means that this is the internal value that refers to the value
       // itself
-      if (props.currentValue) {
+      if (props.treeValue) {
 
         // we check, if we don't have an internal value then certainly
         // this new internal value applies, and also we only care about changing
         // to the internal value new value if the ids are mistmatching as this id
         // represents the unique signature of that value
-        if (!state.currentValue || props.currentValue.id !== state.currentValue.id) {
+        if (!state.treeValue || props.treeValue.id !== state.treeValue.id) {
 
           // so if the criteria passes, and the signatures don't match or there's no internal
           // value to compare against we will update the internal value and clear all the anchors
           return {
-            currentValue: props.currentValue,
+            treeValue: props.treeValue,
             isRichText: props.isRichText,
             currentRootContext: props.rootContext || null,
             currentValid: props.currentValid,
@@ -1284,21 +1397,21 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // string
       } else {
         // and deserialize it based on the props
-        const newcurrentValue = props.isRichText ?
-          deserialize(props.value, state.currentValue, {
+        const newtreeValue = props.isRichText ?
+          deserialize(props.value, state.treeValue, {
             useContextRulesOf: state.currentRootContext,
           }) :
-          deserializePlain(props.value, state.currentValue);
+          deserializePlain(props.value, state.treeValue);
 
         // if there's no internal value to compare, or the new internal value doesn't
         // match with the current, note that the signature will match with parsed values
         // as it uses a namespaced uuid that will give the same value for the same string
-        if (!state.currentValue || newcurrentValue.id !== state.currentValue.id) {
+        if (!state.treeValue || newtreeValue.id !== state.treeValue.id) {
 
           // then we do the same and set the new internal value
           // and clear all the anchors
           return {
-            currentValue: newcurrentValue,
+            treeValue: newtreeValue,
             isRichText: props.isRichText,
             currentRootContext: props.rootContext || null,
             currentValid: props.currentValid,
@@ -1352,7 +1465,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // setting up the internal value from the property
       // first we pick the internal value if available
       // or otherwise we parse one
-      currentValue: props.currentValue || (props.isRichText ? deserialize(props.value, null, {
+      treeValue: props.treeValue || (props.isRichText ? deserialize(props.value, null, {
         useContextRulesOf: props.rootContext,
       }) : deserializePlain(props.value)),
 
@@ -1921,8 +2034,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const pseudoDocument: IRootLevelDocument = {
           type: "document",
           children: node.children as any,
-          id: this.state.currentValue.id,
-          rich: this.state.currentValue.rich,
+          id: this.state.treeValue.id,
+          rich: this.state.treeValue.rich,
         };
 
         const nodeAtSelection = this.editor.selection ? this.getNodeAt(this.editor.selection.anchor.path) : null;
@@ -2321,7 +2434,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // the current element
       let currentLoopingElement = value ? {
         children: value,
-      } as any : this.state.currentValue;
+      } as any : this.state.treeValue;
       const loopingAnchor: Path = [];
 
       // we loop in our text anchor
@@ -2374,7 +2487,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (currentGivenSelectedNodeAnchor) {
       let currentSelectedElementCorruptionTest = value ? {
         children: value,
-      } as any : this.state.currentValue;
+      } as any : this.state.treeValue;
       givenSelectedNodeAnchorIsCorrupted = currentGivenSelectedNodeAnchor.some((n: number, index: number) => {
         if (
           !currentSelectedElementCorruptionTest ||
@@ -2406,7 +2519,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // as well as the selected element
       let currentLoopingElement = value ? {
         children: value,
-      } as any : this.state.currentValue;
+      } as any : this.state.treeValue;
 
       // so we loop in the origin anchor
       currentGivenSelectedNodeAnchor.forEach((n: number, index: number) => {
@@ -2445,8 +2558,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const pseudoDocument: IRootLevelDocument = {
       type: "document",
       children: value as any,
-      id: this.state.currentValue.id,
-      rich: this.state.currentValue.rich,
+      id: this.state.treeValue.id,
+      rich: this.state.treeValue.rich,
     };
 
     const currentSelectedTopmostSuperBlockContext = getContextFor(
@@ -2664,11 +2777,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.Wrapper !== this.props.Wrapper ||
       nextProps.isRichText !== this.props.isRichText ||
       nextProps.rootContext !== this.props.rootContext ||
-      nextProps.rootI18n !== this.props.rootI18n ||
+      nextProps.baseI18n !== this.props.baseI18n ||
       nextState.currentTextAnchor !== this.state.currentTextAnchor ||
       nextState.currentSelectedTextAnchor !== this.state.currentSelectedTextAnchor ||
       nextState.currentRootContext !== this.state.currentRootContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
+      nextProps.elementWrappers !== this.props.elementWrappers ||
       !equals(this.state.allContainers, nextState.allContainers, { strict: true }) ||
       !equals(this.state.allTables, nextState.allTables, { strict: true }) ||
       !equals(this.state.allCustom, nextState.allCustom, { strict: true }) ||
@@ -2685,8 +2799,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // otherwise let's check for internal values signature differences
-    if (nextProps.currentValue && nextState.synced) {
-      return nextProps.currentValue.id !== this.state.currentValue.id;
+    if (nextProps.treeValue && nextState.synced) {
+      return nextProps.treeValue.id !== this.state.treeValue.id;
     }
 
     // otherwise we do allow for the update
@@ -2712,7 +2826,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we don't know the id yet
       id: null,
       type: "document",
-      rich: this.state.currentValue.rich,
+      rich: this.state.treeValue.rich,
       children: v,
     };
 
@@ -2731,28 +2845,28 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (isEqual) {
       // and set the state to that
       this.setState({
-        currentValue: newRootDocument,
+        treeValue: newRootDocument,
         synced: true,
       });
     } else {
       this.setState({
-        currentValue: newRootDocument,
+        treeValue: newRootDocument,
         synced: false,
       });
 
       // now we can set it
       this.updateTimeout = setTimeout(() => {
-        if (this.state.currentValue.rich) {
+        if (this.state.treeValue.rich) {
           if (this.props.cacheStoreCountGlobal) {
             // what we do is that we count the characters
-            const count = countSize(this.state.currentValue);
+            const count = countSize(this.state.treeValue);
             // and set it in the last rich text change cheat variable
             (window as any)[this.props.cacheStoreCountGlobal] = count;
           }
         }
 
         // and now we can trigger the on change event
-        this.props.onChange(serializeString(this.state.currentValue), this.state.currentValue);
+        this.props.onChange(serializeString(this.state.treeValue), this.state.treeValue);
         // and now we are going to wait a little bit more
         this.updateTimeout = setTimeout(() => {
           // to tell it that it should sync
@@ -2784,7 +2898,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return getContextFor(
       pathOfNode,
       level || "final",
-      this.state.currentValue,
+      this.state.treeValue,
       this.state.currentRootContext,
     );
   }
@@ -3152,7 +3266,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // as these values are immutable and we just override them
     // NOW it matters as slate did a weird update where it changes the immutable
     // state because now the state is mutable
-    //if (newValue !== this.state.currentValue.children as any) {
+    //if (newValue !== this.state.treeValue.children as any) {
     // we update, the reason the value might be equal is because the change
     // triggers for changes in the selection
     this.setValue(newValue);
@@ -3243,7 +3357,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.setState(
       this.calculateAnchors(
         this.editor.selection && this.editor.selection.anchor.path,
-        this.state.currentValue.children as any,
+        this.state.treeValue.children as any,
         p,
       ),
     );
@@ -3385,7 +3499,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         this.state.currentSelectedSuperBlockElements[this.state.currentSelectedSuperBlockElements.length - 1];
       return [...currentSelectedSuperBlockElementAnchor, currentSelectedSuperBlockElement.children.length];
     } else {
-      return [this.state.currentValue.children.length];
+      return [this.state.treeValue.children.length];
     }
   }
 
@@ -3449,7 +3563,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         textContent: value || "",
       }, { at: this.state.currentSelectedInlineElementAnchor });
       Transforms.setNodes(this.editor, {
-        text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_text),
+        text: label || localeReplacer(this.props.baseI18n.template, this.props.baseI18n.text),
       }, { at: this.state.currentSelectedTextAnchor });
     }
   }
@@ -3468,7 +3582,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       bold: false,
       italic: false,
       underline: false,
-      text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_text),
+      text: label || localeReplacer(this.props.baseI18n.template, this.props.baseI18n.text),
     };
 
     // and now we build a paragraph node to put the text there
@@ -3492,7 +3606,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         html: value || "",
       }, { at: this.state.currentSelectedBlockElementAnchor });
       Transforms.setNodes(this.editor, {
-        text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_container),
+        text: label || localeReplacer(this.props.baseI18n.template, this.props.baseI18n.container),
       }, { at: this.state.currentSelectedTextAnchor });
     }
   }
@@ -3512,7 +3626,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       bold: false,
       italic: false,
       underline: false,
-      text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_container),
+      text: label || localeReplacer(this.props.baseI18n.template, this.props.baseI18n.container),
     }
 
     // and a container to make it be the inner html
@@ -4539,7 +4653,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       href: url,
       thref: tvalue,
       children: [
-        STANDARD_TEXT_NODE(this.props.rootI18n.rich_link)
+        STANDARD_TEXT_NODE(this.props.baseI18n.link)
       ]
     }
 
@@ -4841,12 +4955,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return {
         value: c,
         label: (
-          this.props.rootI18n &&
-          this.props.rootI18n[i18nLocation] &&
+          this.props.baseI18n &&
+          this.props.baseI18n[i18nLocation] &&
           (
             // both the default and by replacing
-            this.props.rootI18n[i18nLocation][c] ||
-            this.props.rootI18n[i18nLocation][c.replace(/-/g, "_")]
+            this.props.baseI18n[i18nLocation][c] ||
+            this.props.baseI18n[i18nLocation][c.replace(/-/g, "_")]
           )
         ) || c
         // and if we find nothing we use the value itself
@@ -5025,10 +5139,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // we get these from the available filtering functions
-    const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "rich_customs");
-    const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich_classes");
-    const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "rich_containers");
-    const availableTables = this.availableFilteringFunction("supportsTables", "allTables", "supportedTables", "rich_tables");
+    const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "richCustoms");
+    const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "richClasses");
+    const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "richContainers");
+    const availableTables = this.availableFilteringFunction("supportsTables", "allTables", "supportedTables", "richTables");
 
     // and extend based on the features
     const newFeatureSupport: IAccessibleFeatureSupportOptions = {
@@ -5146,6 +5260,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
           ref={this.wrapperRef}
+          baseI18n={this.props.baseI18n}
         >
           {children}
         </Wrapper>
@@ -5158,15 +5273,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // https://github.com/ianstormtaylor/slate/pull/4540
-    if (this.state.currentValue.children !== this.editor.children) {
-      this.editor.children = this.state.currentValue.children;
+    if (this.state.treeValue.children !== this.editor.children) {
+      this.editor.children = this.state.treeValue.children;
     }
 
     // now we can return
     return (
       <Slate
         editor={this.editor}
-        value={this.state.currentValue.children}
+        value={this.state.treeValue.children}
         onChange={this.onChange}
       >
         {children}

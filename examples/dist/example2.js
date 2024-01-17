@@ -1,7 +1,7 @@
 import {
   renderTemplateDontSanitize,
   renderTemplateDynamically
-} from "/dist/commons-QKGY5TOU.js";
+} from "/dist/commons-6NDWBSM5.js";
 import {
   MutatingTemplateArgs,
   TemplateArgs,
@@ -10,7 +10,7 @@ import {
   require_react,
   require_react_dom,
   sanitize
-} from "/dist/commons-KGSYNVQR.js";
+} from "/dist/commons-EJSJQMMI.js";
 
 // example2.tsx
 var import_react = __toESM(require_react());

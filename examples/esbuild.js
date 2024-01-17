@@ -31,6 +31,7 @@ const build = esbuild.build({
     './example1.tsx',
     './example2.tsx',
     './example3.tsx',
+    './example4.tsx',
   ],
   entryNames: "[name]",
   sourcemap: 'inline',
