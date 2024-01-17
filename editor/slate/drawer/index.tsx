@@ -8,11 +8,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
 // import { GeneralOptions } from "./general";
-// import { StylesOptions } from "./styles";
 // import { ActionsOptions } from "./actions";
 // import { TemplatingOptions } from "./templating";
 import { INodeInfo, getInfoFor } from "../..";
 import { GeneralOptions } from "./general";
+import { StylesOptions } from "./styles";
 
 
 export interface IWrapperDrawerElementTitleProps {
@@ -139,9 +139,9 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
       case "MAIN":
         infoPanel = <GeneralOptions {...props} />;
         break;
-      // case "STYLES":
-      //   infoPanel = <StylesOptions {...props} />;
-      //   break;
+      case "STYLES":
+        infoPanel = <StylesOptions {...props} />;
+        break;
       // case "ACTIONS":
       //   infoPanel = <ActionsOptions {...props} />;
       //   break;

@@ -16,22 +16,112 @@ export function DefaultWrapperDrawerInternalPanelWrapper(props: { children: Reac
   )
 }
 
-export interface IDefaultWrapperDrawerTextFieldProps {
+export interface IWrapperDrawerTextFieldProps {
   value: string;
   label: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeByEvent: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeByValue: (v: string) => void;
   id: string;
 }
 
-export function DefaultWrapperDrawerTextField(props: IDefaultWrapperDrawerTextFieldProps) {
+export interface IWrapperDrawerSelectFieldProps {
+  value: string;
+  label: string;
+  onChangeByEvent: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChangeByValue: (v: string) => void;
+  id: string;
+  options: Array<{ value: string; label: string }>;
+  unblur: () => void;
+  resetBlur: () => void;
+}
+
+export interface IWrapperDrawerMultiSelectFieldProps {
+  values: string[];
+  label: string;
+  onChange: (v: string[]) => void;
+  id: string;
+  options: Array<{ value: string; label: string }>;
+  unblur: () => void;
+  resetBlur: () => void;
+}
+
+export interface IWrapperDrawerCheckBoxProps {
+  value: boolean;
+  label: string;
+  onChange: (v: boolean) => void;
+  id: string;
+}
+
+export function DefaultWrapperDrawerTextField(props: IWrapperDrawerTextFieldProps) {
   return (
-    <input
-      className="slateEditorWrapperDrawerTextField"
-      value={props.value}
-      placeholder={props.label}
-      onChange={props.onChange}
-    />
+    <div className="slateEditorWrapperDrawerTextField">
+      <label>{props.label}</label>
+      <input
+        value={props.value}
+        placeholder={props.label}
+        onChange={props.onChangeByEvent}
+      />
+    </div>
   )
+}
+
+export function DefaultWrapperDrawerSelectField(props: IWrapperDrawerSelectFieldProps) {
+  return (
+    <div className="slateEditorWrapperDrawerSelectField">
+      <label>{props.label}</label>
+      <select
+        value={props.value}
+        onChange={props.onChangeByEvent}
+      >
+        {props.options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export function DefaultWrapperDrawerMultiSelectField(props: IWrapperDrawerMultiSelectFieldProps) {
+  const handleSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+    props.onChange(selectedOptions);
+  }, []);
+  return (
+    <div className="slateEditorWrapperDrawerMultiSelectField">
+      <label>{props.label}</label>
+      <select
+        multiple={true}
+        value={props.values}
+        onChange={handleSelectChange}
+      >
+        {props.options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export function DefaultWrapperDrawerCheckBoxField(props: IWrapperDrawerCheckBoxProps) {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked;
+    props.onChange(newValue);
+  };
+
+  return (
+    <div className="slateEditorWrapperDrawerCheckBoxField">
+      <input
+        type="checkbox"
+        checked={props.value}
+        onChange={handleChange}
+      />
+      <label>{props.label}</label>
+    </div>
+  );
 }
 
 /**
@@ -48,29 +138,35 @@ export function GeneralOptions(props: IDrawerContainerProps) {
 
   const lastUpdateRef = useRef<any>();
 
-  const updateName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+  const updateNameB = useCallback((v: string) => {
+    setName(v);
     clearTimeout(lastUpdateRef.current);
     lastUpdateRef.current = setTimeout(() => {
       props.helpers.set({
-        givenName: e.target.value,
+        givenName: v,
       }, props.state.currentSelectedElementAnchor);
     }, 600);
   }, [props.state.currentSelectedElement]);
+
+  const updateName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateNameB(e.target.value);
+  }, [updateNameB]);
 
   if (!props.state.currentSelectedElement) {
     return null;
   }
 
   const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
+  const WrapperDrawerTextField = props.WrapperDrawerTextField || DefaultWrapperDrawerTextField;
 
   // and return
   return (
     <WrapperDrawerInternalPanelWrapper>
-      <DefaultWrapperDrawerTextField
+      <WrapperDrawerTextField
         value={name}
         label={props.baseI18n.name}
-        onChange={updateName}
+        onChangeByEvent={updateName}
+        onChangeByValue={updateNameB}
         id="name"
       />
       {

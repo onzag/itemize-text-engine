@@ -20,7 +20,7 @@ import { countSizeAndWords } from "../../util";
 import { STANDARD_TEXT_NODE } from "../../serializer/types/text";
 import { IBaseI18nRichTextInfo, defaultBaseI18nRichInfoEnglish } from ".";
 import { IWrapperDrawerElementTitleProps, IWrapperDrawerInfoPanelWrapperProps, IWrapperDrawerTabsProps } from "./drawer";
-import type { IDefaultWrapperDrawerTextFieldProps } from "./drawer/general";
+import type { IWrapperDrawerCheckBoxProps, IWrapperDrawerMultiSelectFieldProps, IWrapperDrawerSelectFieldProps, IWrapperDrawerTextFieldProps } from "./drawer/general";
 
 export const defaultWrapperI18nRichInfoEnglish: IWrapperI18nRichTextInfo = {
   ...defaultBaseI18nRichInfoEnglish,
@@ -518,7 +518,7 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   /**
    * Used for wrapping all the titles generated
    */
-  WrapperDrawerElementTitleWrapper?: React.ComponentType<{children: React.ReactNode}>;
+  WrapperDrawerElementTitleWrapper?: React.ComponentType<{ children: React.ReactNode }>;
 
   /**
    * Wraps the information panel from the drawer, whatever is visible
@@ -533,12 +533,27 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   /**
    * Used to wrap the internal panel
    */
-  WrapperDrawerInternalPanelWrapper?: React.ComponentType<{children: React.ReactNode}>;
+  WrapperDrawerInternalPanelWrapper?: React.ComponentType<{ children: React.ReactNode }>;
 
   /**
    * Used to make text input fields
    */
-  WrapperDrawerTextFieldProps?: React.ComponentType<IDefaultWrapperDrawerTextFieldProps>;
+  WrapperDrawerTextField?: React.ComponentType<IWrapperDrawerTextFieldProps>;
+
+  /**
+   * Used to make checkbox input fields
+   */
+  WrapperDrawerCheckboxField?: React.ComponentType<IWrapperDrawerCheckBoxProps>;
+
+  /**
+   * Used to make select input fields
+   */
+  WrapperDrawerSelectField?: React.ComponentType<IWrapperDrawerSelectFieldProps>;
+
+  /**
+ * Used to make select input fields
+ */
+  WrapperDrawerMultiSelectField?: React.ComponentType<IWrapperDrawerMultiSelectFieldProps>;
 
   /**
    * add extra children to the drawer
@@ -2312,7 +2327,7 @@ class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerCont
           toolbarHeight={this.props.toolbarHeight}
           drawerOpen={this.props.drawerOpen}
         >
-          <WrapperDrawer {...this.props}/>
+          <WrapperDrawer {...this.props} />
         </DrawerBody>
       </DrawerContainerBox>
     );

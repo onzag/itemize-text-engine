@@ -4,41 +4,12 @@
  * @module
  */
 
-import { RichElement } from "../../../../internal/text/serializer";
+import { RichElement } from "../../../serializer";
 import React, { useCallback } from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import { Path } from "slate";
 import equals from "deep-equal";
-import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import FilledInput from "@mui/material/FilledInput";
-import Chip from "@mui/material/Chip";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-
-const style = {
-  selectionInput: {
-    width: "100%",
-  },
-  box: {
-    padding: "0.5rem",
-  },
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  chip: {
-    margin: 2,
-  },
-  input: {
-    width: "100%",
-  },
-};
+import { DefaultWrapperDrawerCheckBoxField, DefaultWrapperDrawerInternalPanelWrapper, DefaultWrapperDrawerMultiSelectField, DefaultWrapperDrawerTextField, IWrapperDrawerTextFieldProps } from "./general";
 
 /**
  * The single style option props that define a single
@@ -67,14 +38,15 @@ interface ISingleStyleProps {
    * every time a keypress is done
    */
   onChange: (value: string, anchor: Path) => void;
+
   /**
-   * Class name for the box that contains it all
+   * The text field to use
    */
-  boxClassName?: string;
+  TextField?: React.ComponentType<IWrapperDrawerTextFieldProps>;
   /**
-   * Class name for the input itself
+   * The id of the field
    */
-  inputClassName?: string;
+  id: string;
 }
 
 /**
@@ -130,6 +102,7 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
 
     // bind the functions
     this.onStyleChange = this.onStyleChange.bind(this);
+    this.onStyleChangeB = this.onStyleChangeB.bind(this);
 
     // set the initial state
     this.state = {
@@ -143,8 +116,14 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
    * @param e the change event in question
    */
   public onStyleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // set the new value
-    const newValue = e.target.value || null;
+    this.onStyleChangeB(e.target.value);
+  }
+
+  /**
+   * Triggers each time the input for the style changes
+   * @param e the change event in question
+   */
+  public onStyleChangeB(newValue: string = null) {
     // set the state
     this.setState({
       value: newValue || "",
@@ -158,19 +137,15 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
    * The standard render function
    */
   public render() {
+    const TextField = this.props.TextField || DefaultWrapperDrawerTextField;
     return (
-      <div className={this.props.boxClassName}>
-        <TextField
-          fullWidth={true}
-          type="text"
-          value={this.state.value}
-          className={this.props.inputClassName}
-          onChange={this.onStyleChange}
-          placeholder={this.props.name}
-          label={this.props.name}
-          variant="filled"
-        />
-      </div>
+      <TextField
+        value={this.state.value}
+        onChangeByValue={this.onStyleChangeB}
+        onChangeByEvent={this.onStyleChange}
+        label={this.props.name}
+        id={this.props.id}
+      />
     );
   }
 }
@@ -252,13 +227,9 @@ class ClassesOptionSelector extends React.PureComponent<IDrawerContainerProps, I
 
   /**
    * Triggers when the select field changes and receives a new value
-   * // TODOCHECKMUIUPGRADE
    * @param e the change event
    */
-  public onRichClassListChange(e: SelectChangeEvent<any>) {
-    // we pick it off, as it's an array of string because
-    // this is a multiselect
-    let newValue: string[] = e.target.value;
+  public onRichClassListChange(newValue: string[] = []) {
     // now we can update the state
     this.setState({
       value: newValue,
@@ -289,36 +260,22 @@ class ClassesOptionSelector extends React.PureComponent<IDrawerContainerProps, I
    */
   public render() {
     // we use a chip form in order to make it for multiple selection
+    const MultiSelector = this.props.WrapperDrawerMultiSelectField || DefaultWrapperDrawerMultiSelectField;
     return (
-      <FormControl sx={style.selectionInput} variant="filled">
-        <InputLabel id="slate-styles-option-selector-rich-classes-label">{this.props.i18nRichInfo.classes}</InputLabel>
-        <Select
-          labelId="slate-styles-option-selector-rich-classes-label"
-          id="slate-styles-option-selector-rich-classes"
-          sx={style.selectionInput}
-          multiple={true}
-          value={this.state.value}
-          onChange={this.onRichClassListChange}
-          input={<FilledInput id="slate-styles-option-selector-rich-classes-chip" />}
-          renderValue={(selected: string[]) => (
-            <Box sx={style.chips}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} sx={style.chip} color="primary" />
-              ))}
-            </Box>
-          )}
-          onOpen={this.unblur}
-          onClose={this.resetBlur}
-        >
-          {
-            this.props.featureSupport.availableRichClasses.map((element) => (
-              <MenuItem key={element.value} value={element.value}>
-                {element.label}
-              </MenuItem>
-            ))
-          }
-        </Select>
-      </FormControl>
+      <MultiSelector
+        id="rich-class"
+        label={this.props.baseI18n.classes}
+        onChange={this.onRichClassListChange}
+        options={this.props.featureSupport.availableRichClasses.map((element) => (
+          ({
+            label: element.label,
+            value: element.value,
+          })
+        ))}
+        resetBlur={this.resetBlur}
+        unblur={this.unblur}
+        values={this.state.value}
+      />
     );
   }
 }
@@ -330,9 +287,9 @@ class ClassesOptionSelector extends React.PureComponent<IDrawerContainerProps, I
  * options of the wrapper itself
  */
 export function StylesOptions(props: IDrawerContainerProps) {
-  const toggleStandalone = useCallback((e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+  const setStandalone = useCallback((v: boolean) => {
     props.helpers.set({
-      standalone: checked,
+      standalone: v,
     }, props.state.currentSelectedElementAnchor);
   }, []);
 
@@ -340,35 +297,38 @@ export function StylesOptions(props: IDrawerContainerProps) {
     return null;
   }
 
+  const CheckboxField = props.WrapperDrawerCheckboxField || DefaultWrapperDrawerCheckBoxField;
+
   const imgStandalone = props.state.currentSelectedElement.type === "image" ? (
-    <FormGroup>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={props.state.currentSelectedElement.standalone}
-            onChange={toggleStandalone}
-          />
-        }
-        label={props.i18nRichInfo.standalone}
-      />
-    </FormGroup>
+    <CheckboxField
+      onChange={setStandalone}
+      id="image-standalone"
+      label={props.baseI18n.standalone}
+      value={props.state.currentSelectedElement.standalone}
+    />
   ) : null;
 
   const currentNode = props.state.currentSelectedElement as RichElement;
+  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
+
   return (
-    <Box sx={style.box}>
+    <WrapperDrawerInternalPanelWrapper>
       {imgStandalone}
       {
         props.featureSupport.supportsRichClasses ?
-          <ClassesOptionSelector {...props} /> : null
+          <ClassesOptionSelector
+            {...props}
+          /> : null
       }
       {
         props.featureSupport.supportsCustomStyles ?
           <SingleStyle
             anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setStyle}
-            name={props.i18nRichInfo.style}
+            name={props.baseI18n.style}
             styleValue={currentNode.style}
+            TextField={props.WrapperDrawerTextField}
+            id="style"
           /> : null
       }
       {
@@ -376,8 +336,10 @@ export function StylesOptions(props: IDrawerContainerProps) {
           <SingleStyle
             anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setHoverStyle}
-            name={props.i18nRichInfo.styleHover}
+            name={props.baseI18n.styleHover}
             styleValue={currentNode.styleHover}
+            TextField={props.WrapperDrawerTextField}
+            id="style-hover"
           /> : null
       }
       {
@@ -385,10 +347,12 @@ export function StylesOptions(props: IDrawerContainerProps) {
           <SingleStyle
             anchor={props.state.currentSelectedElementAnchor}
             onChange={props.helpers.setActiveStyle}
-            name={props.i18nRichInfo.styleActive}
+            name={props.baseI18n.styleActive}
             styleValue={currentNode.styleActive}
+            TextField={props.WrapperDrawerTextField}
+            id="style-active"
           /> : null
       }
-    </Box>
+    </WrapperDrawerInternalPanelWrapper>
   );
 }
