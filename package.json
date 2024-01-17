@@ -21,6 +21,10 @@
     "deep-equal": "^1.1.2",
     "dompurify": "^3.0.8",
     "jsdom": "^23.2.0",
+    "pretty-bytes": "^6.1.1",
+    "slate": "^0.101.5",
+    "slate-history": "^0.100.0",
+    "slate-react": "^0.90.0",
     "typescript": "^4.9.5",
     "uuid": "^3.4.0"
   },

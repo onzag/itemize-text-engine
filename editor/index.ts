@@ -4,13 +4,12 @@ import { IText } from "../serializer/types/text";
 /**
  * locale replacer function used here so that itemize is not needed to be imported
  * this is a copy
- * @ignore
  * 
  * @param str 
  * @param args 
  * @returns 
  */
-function localeReplacer(str: string, ...args: any[]): string {
+export function localeReplacer(str: string, ...args: any[]): string {
   return str.replace(/\{(\d+)\}/g, (match, indexMatch) => {
     if (typeof args[indexMatch] === "undefined") {
       return "?";
@@ -19,6 +18,93 @@ function localeReplacer(str: string, ...args: any[]): string {
     }
     return args[indexMatch].toString();
   });
+}
+
+/**
+ * @ignore
+ */
+const mimeExtensions = {
+  "audio/aac": "aac",
+  "application/x-abiword": "abw",
+  "application/x-freearc": "arc",
+  "video/x-msvideo": "avi",
+  "application/vnd.amazon.ebook": "azw",
+  "application/octet-stream": "bin",
+  "image/bmp": "bmp",
+  "application/x-bzip": "bz",
+  "application/x-bzip2": "bz2",
+  "application/x-csh": "csh",
+  "text/css": "css",
+  "text/csv": "csv",
+  "application/msword": "doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+  "application/vnd.ms-fontobject": "eot",
+  "application/epub+zip": "epub",
+  "image/gif": "gif",
+  "text/html": "html",
+  "image/vnd.microsoft.icon": "ico",
+  "text/calendar": "ics",
+  "application/java-archive": "jar",
+  "image/jpeg": "jpg",
+  "text/javascript": "js",
+  "application/json": "json",
+  "application/ld+json": "jsonld",
+  "audio/midi audio/x-midi": "mid",
+  "audio/mpeg": "mp3",
+  "video/mpeg": "mpeg",
+  "application/vnd.apple.installer+xml": "mpkg",
+  "application/vnd.oasis.opendocument.presentation": "odp",
+  "application/vnd.oasis.opendocument.spreadsheet": "ods",
+  "application/vnd.oasis.opendocument.text": "odt",
+  "audio/ogg": "oga",
+  "video/ogg": "ogv",
+  "application/ogg": "ogx",
+  "font/otf": "otf",
+  "image/png": "png",
+  "application/pdf": "pdf",
+  "application/vnd.ms-powerpoint": "ppt",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+  "application/x-rar-compressed": "rar",
+  "application/rtf": "rtf",
+  "application/x-sh": "sh",
+  "image/svg+xml": "svg",
+  "application/x-shockwave-flash": "swf",
+  "application/x-tar": "tar",
+  "image/tiff": "tiff",
+  "font/ttf": "ttf",
+  "text/plain": "txt",
+  "application/vnd.visio": "vsd",
+  "audio/wav": "wav",
+  "audio/webm": "weba",
+  "video/webm": "webm",
+  "image/webp": "webp",
+  "font/woff": "woff",
+  "font/woff2": "woff2",
+  "application/xhtml+xml": "xhtml",
+  "application/vnd.ms-excel": "xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+  "application/xml if not readable from casual users (RFC 3023, section 3)": "xml",
+  "application/vnd.mozilla.xul+xml": "xul",
+  "application/zip": "zip",
+  "video/3gpp": "3gp",
+  "video/3gpp2": "3g2",
+  "application/x-7z-compressed": "7z",
+};
+
+/**
+ * Converts a mime type to an extension using a known extension list
+ * 
+ * Copied so that itemize doesn't need to be imported as well
+ * 
+ * @param str the string that represents the mime type
+ * @returns an extension or txt if it doesn't know
+ */
+export function mimeTypeToExtension(str: string) {
+  const expectedExt = mimeExtensions[str];
+  if (expectedExt) {
+    return expectedExt;
+  }
+  return (str.split("/")[1] || "txt").substr(0, 3);
 }
 
 

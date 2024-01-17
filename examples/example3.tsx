@@ -1,11 +1,9 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import ReactDOM from "react-dom";
 import { deserialize } from "../serializer";
 import { IFeatureSupportOptions, sanitize } from "../sanitizer";
-import { renderTemplateDontSanitize, renderTemplateDynamically } from "../renderer";
-import { MutatingTemplateArgs, TemplateArgs } from "../serializer/template-args";
-import { IParagraph } from "../serializer/types/paragraph";
-import { IImage } from "../serializer/types/image";
+import { renderTemplateDynamically } from "../renderer";
+import { TemplateArgs } from "../serializer/template-args";
 import { IUIHandlerProps } from "../serializer/base";
 
 const featureSupport: IFeatureSupportOptions = {
