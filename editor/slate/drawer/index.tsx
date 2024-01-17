@@ -12,6 +12,7 @@ import { IDrawerContainerProps } from "../wrapper";
 // import { ActionsOptions } from "./actions";
 // import { TemplatingOptions } from "./templating";
 import { INodeInfo, getInfoFor } from "../..";
+import { GeneralOptions } from "./general";
 
 
 export interface IWrapperDrawerElementTitleProps {
@@ -134,20 +135,20 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   if (props.state.currentSelectedElement) {
     // and according to that decide which panel to render
     let infoPanel: React.ReactNode = null;
-    // switch (location) {
-    //   case "MAIN":
-    //     infoPanel = <GeneralOptions {...props} />;
-    //     break;
-    //   case "STYLES":
-    //     infoPanel = <StylesOptions {...props} />;
-    //     break;
-    //   case "ACTIONS":
-    //     infoPanel = <ActionsOptions {...props} />;
-    //     break;
-    //   case "TEMPLATING":
-    //     infoPanel = <TemplatingOptions {...props} />;
-    //     break;
-    //}
+    switch (location) {
+      case "MAIN":
+        infoPanel = <GeneralOptions {...props} />;
+        break;
+      // case "STYLES":
+      //   infoPanel = <StylesOptions {...props} />;
+      //   break;
+      // case "ACTIONS":
+      //   infoPanel = <ActionsOptions {...props} />;
+      //   break;
+      // case "TEMPLATING":
+      //   infoPanel = <TemplatingOptions {...props} />;
+      //   break;
+    }
 
     const selectedNodeInfo = getInfoFor(
       props.state.currentSelectedElement,

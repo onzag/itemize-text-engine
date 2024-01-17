@@ -2778,8 +2778,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.isRichText !== this.props.isRichText ||
       nextProps.rootContext !== this.props.rootContext ||
       nextProps.baseI18n !== this.props.baseI18n ||
-      nextState.currentTextAnchor !== this.state.currentTextAnchor ||
-      nextState.currentSelectedTextAnchor !== this.state.currentSelectedTextAnchor ||
+      !equals(nextState.currentTextAnchor, this.state.currentTextAnchor, {strict: true}) ||
+      !equals(nextState.currentSelectedTextAnchor !== this.state.currentSelectedTextAnchor, {strict: true}) ||
       nextState.currentRootContext !== this.state.currentRootContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
       nextProps.elementWrappers !== this.props.elementWrappers ||

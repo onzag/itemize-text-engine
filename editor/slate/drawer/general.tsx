@@ -7,15 +7,32 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 
-const style = {
-  box: {
-    padding: "0.5rem",
-  },
-};
+export function DefaultWrapperDrawerInternalPanelWrapper(props: { children: React.ReactNode }) {
+  return (
+    <div className="slateEditorWrapperDrawerInternalPanelWrapper">
+      {props.children}
+    </div>
+  )
+}
+
+export interface IDefaultWrapperDrawerTextFieldProps {
+  value: string;
+  label: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  id: string;
+}
+
+export function DefaultWrapperDrawerTextField(props: IDefaultWrapperDrawerTextFieldProps) {
+  return (
+    <input
+      className="slateEditorWrapperDrawerTextField"
+      value={props.value}
+      placeholder={props.label}
+      onChange={props.onChange}
+    />
+  )
+}
 
 /**
  * Provides the drawer section with all the general options of a given component
@@ -45,25 +62,17 @@ export function GeneralOptions(props: IDrawerContainerProps) {
     return null;
   }
 
+  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
+
   // and return
   return (
-    <Box sx={style.box}>
-      <AltBadgeReactioner
-        action="focus"
-        reactionKey="n"
-        priority={3}
-        selector="input"
-        fullWidth={true}
-      >
-        <TextField
-          value={name}
-          label={props.i18nRichInfo.name}
-          placeholder={props.i18nRichInfo.name}
-          variant="filled"
-          onChange={updateName}
-          fullWidth={true}
-        />
-      </AltBadgeReactioner>
+    <WrapperDrawerInternalPanelWrapper>
+      <DefaultWrapperDrawerTextField
+        value={name}
+        label={props.baseI18n.name}
+        onChange={updateName}
+        id="name"
+      />
       {
         props.drawerExtras ? (
           props.drawerExtras.map((v, i) => {
@@ -72,6 +81,6 @@ export function GeneralOptions(props: IDrawerContainerProps) {
           })
         ) : null
       }
-    </Box>
+    </WrapperDrawerInternalPanelWrapper>
   );
 }

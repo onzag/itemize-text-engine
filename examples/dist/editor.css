@@ -87,3 +87,7 @@ html[dir="rtl"] .slateEditorWrapperDrawerElementTitleIconLtrOnly {
     background-color: #eee;
     cursor: pointer;
 }
+
+.slateEditorWrapperDrawerTextField {
+    margin-top: 10px;
+}

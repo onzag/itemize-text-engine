@@ -20,6 +20,7 @@ import { countSizeAndWords } from "../../util";
 import { STANDARD_TEXT_NODE } from "../../serializer/types/text";
 import { IBaseI18nRichTextInfo, defaultBaseI18nRichInfoEnglish } from ".";
 import { IWrapperDrawerElementTitleProps, IWrapperDrawerInfoPanelWrapperProps, IWrapperDrawerTabsProps } from "./drawer";
+import type { IDefaultWrapperDrawerTextFieldProps } from "./drawer/general";
 
 export const defaultWrapperI18nRichInfoEnglish: IWrapperI18nRichTextInfo = {
   ...defaultBaseI18nRichInfoEnglish,
@@ -528,6 +529,16 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
    * Used for the tabs switcher component that is used in the drawer
    */
   WrapperDrawerTabs?: React.ComponentType<IWrapperDrawerTabsProps>;
+
+  /**
+   * Used to wrap the internal panel
+   */
+  WrapperDrawerInternalPanelWrapper?: React.ComponentType<{children: React.ReactNode}>;
+
+  /**
+   * Used to make text input fields
+   */
+  WrapperDrawerTextFieldProps?: React.ComponentType<IDefaultWrapperDrawerTextFieldProps>;
 
   /**
    * add extra children to the drawer

@@ -8,16 +8,6 @@ import React from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import { Path } from "slate";
 
-const style = {
-  box: {
-    padding: "0.5rem",
-  },
-  optionPrimary: {
-    fontWeight: 700,
-    color: "#1b5e20",
-  },
-};
-
 /**
  * This is the list of events that we support
  * @ignore
@@ -267,7 +257,7 @@ export function ActionsOptions(props: IDrawerContainerProps) {
     (
       props.state.currentSelectedSuperBlockElements &&
       props.state.currentSelectedSuperBlockElements[
-        props.state.currentSelectedSuperBlockElements.length - 1
+      props.state.currentSelectedSuperBlockElements.length - 1
       ]
     );
 
@@ -280,7 +270,7 @@ export function ActionsOptions(props: IDrawerContainerProps) {
     (
       props.state.currentSelectedSuperBlockElementAnchors &&
       props.state.currentSelectedSuperBlockElementAnchors[
-        props.state.currentSelectedSuperBlockElementAnchors.length - 1
+      props.state.currentSelectedSuperBlockElementAnchors.length - 1
       ]
     );
 
@@ -324,6 +314,8 @@ export function ActionsOptions(props: IDrawerContainerProps) {
       }
     }).filter((v) => !!v));
   }
+
+  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || "div";
 
   // now we can return the whole box
   return (
