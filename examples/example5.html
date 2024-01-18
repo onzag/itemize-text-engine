@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>example 5</title>
+
+    <link rel="stylesheet" href="dist/dist.css">
+    <link rel="stylesheet" href="dist/editor.css">
+
+    <style>
+        code {
+            white-space: pre;
+            margin-top: 5px;
+            display: block;
+            text-wrap: balance;
+        }
+
+        section {
+            margin-bottom: 50px;
+            border-top: solid 1px black;
+            overflow: hidden;
+        }
+
+        @keyframes colorChange {
+            0% {
+                color: red;
+                /* Initial color */
+            }
+
+            33% {
+                color: blue;
+                /* Color change at 1 second */
+            }
+
+            66% {
+                color: green;
+                /* Color change at 2 seconds */
+            }
+
+            100% {
+                color: red;
+                /* Back to the initial color at 3 seconds */
+            }
+        }
+
+        .rich-text--sparkling-text {
+            animation: colorChange 3s infinite;
+            /* Run the animation every 3 seconds */
+        }
+
+        @keyframes borderChange {
+            0% {
+                border-color: red;
+                /* Initial border color */
+            }
+
+            33% {
+                border-color: blue;
+                /* Border color change at 1 second */
+            }
+
+            66% {
+                border-color: green;
+                /* Border color change at 2 seconds */
+            }
+
+            100% {
+                border-color: red;
+                /* Back to the initial border color at 3 seconds */
+            }
+        }
+
+        .container-happy {
+            width: 100px;
+            height: 100px;
+            border: 2px solid;
+            /* Set initial border properties */
+            animation: borderChange 3s infinite;
+            /* Run the animation every 3 seconds */
+        }
+    </style>
+
+    <script type="module" src="./dist/example5.js" defer></script>
+</head>
+
+<body>
+    <div id="app"></div>
+</body>
+
+</html>

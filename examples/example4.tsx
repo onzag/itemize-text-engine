@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import ReactDOM from "react-dom";
 import { deserialize } from "../serializer";
 import { IFeatureSupportOptions, sanitize } from "../sanitizer";
-import { SlateEditor, defaultBaseI18nRichInfoEnglish } from "../editor/slate";
+import { ISlateFile, ISlateInsertedFileInformationType, SlateEditor, defaultBaseI18nRichInfoEnglish } from "../editor/slate";
 import { DefaultSlateWrapper, defaultWrapperI18nRichInfoEnglish } from "../editor/slate/wrapper";
 import { defaultElementWrappers } from "../editor/slate/element-wrappers";
 
@@ -15,12 +15,10 @@ const featureSupportBasic: IFeatureSupportOptions = {
   supportsCustom: true,
   supportsCustomStyles: true,
   supportsExternalLinks: true,
-  // we will disable both files and images
-  // for now
-  supportsFiles: false,
-  supportsFilesAccept: null,
-  supportsImages: false,
-  supportsImagesAccept: null,
+  supportsFiles: true,
+  supportsFilesAccept: "*",
+  supportsImages: true,
+  supportsImagesAccept: "image/*",
   supportsLinks: true,
   supportsLists: true,
   supportsQuote: true,
@@ -49,73 +47,124 @@ function Example() {
   const [htmlValue, setHtmlValue] = useState(sanitized1);
   const [treeValue, setTreeValue] = useState(textTree1);
 
+  const [files, setFiles] = useState([] as Array<{
+    file: ISlateFile;
+    isImage: boolean;
+  }>);
+
+  const onInsertFile = useCallback(async (file: File, isExpectingImage?: boolean) => {
+    // if you want to reject here you should set an error and pass it to currentLoadError
+    // however we are not handling these errors right now we will accept whatever
+    // but you should validate your file
+
+
+    // for this tutorial we are going to blindly trust
+
+    const fileData: ISlateFile = {
+      // you should probably use some uuid instead of this
+      id: "FILE" + Math.random().toString().substring(2),
+      metadata: null,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file),
+      src: file,
+    };
+
+    if (isExpectingImage) {
+      return await new Promise<ISlateInsertedFileInformationType>(async (resolve) => {
+        // so we create an image
+        const img = new Image();
+        // on load
+        img.onload = () => {
+          // we build the metadata
+          fileData.metadata = img.width + "x" + img.height;
+
+          // and resolve
+          setFiles([...files, {
+            file: fileData,
+            isImage: true,
+          }]);
+          resolve({
+            result: fileData,
+            width: img.width,
+            height: img.height,
+            isImage: true,
+          });
+        }
+        img.onerror = () => {
+          // on error should probably do something
+          resolve(null);
+        }
+        // and this is assigned the url of the image
+        img.src = fileData.url;
+      });
+    }
+
+    setFiles([...files, {
+      file: fileData,
+      isImage: true,
+    }]);
+
+    return {
+      result: fileData,
+      width: null,
+      height: null,
+      isImage: false,
+    }
+  }, [files]);
+
+  const onInsertFileFromURL = useCallback(async (url: string, name: string, isExpectingImage: boolean) => {
+    let blob: any;
+    try {
+      const fileData = await fetch(url);
+      blob = await fileData.blob();
+
+      // we are going to use a trick, we could use the File constructor
+      // but there were a lot of complains regarding the constructor on stackoverflow
+      // while as a matter of fact the src allows for blobs so
+      blob.name = name;
+    } catch (err) {
+      // failed to fetch
+      return null;
+    }
+
+    // there, it will work
+    // now this is a funny thing since the data uri might
+    // be a remote URL as well, depends on what we used to load
+    // from
+    return this.onInsertFile(blob, isExpectingImage);
+  }, [onInsertFile]);
+
+  const onRetrieveFile = useCallback((fileId: string) => {
+    const file = files.find((f) => f.file.id === fileId) || null;
+    return  file?.file || null;
+  }, [files]);
+
+  const onRetrieveImage = useCallback((fileId: string) => {
+    const file = onRetrieveFile(fileId);
+    if (file) {
+      // we don't know a srcset
+      return  {
+        file,
+        srcset: null,
+      }
+    }
+
+    return null;
+  }, [onRetrieveFile]);
+
   return (
     <div>
       <h1>Basic Editing</h1>
-
-      <section>
-        <h4>
-          This is a very basic editor, with no added Wrappers, it's basically useless other
-          than from editing basic text, and not recommended to use; note that all editors are mostly unstyled
-          while there are styles associated with the editor, they are mostly meant to be a reference of what
-          each component is supposed to be, the `editor.css` file constains these styles, but it's not recommended
-          to use, the editor is supposed to be configured into the look and theme that is wanted
-          there's no default theme, it's just plain and ugly HTML, but it can be made to look pretty
-        </h4>
-        <h4>
-          The contents themselves however are more stylized and the `dist.css` file or the `original.scss` file
-          is expected to be included in production, modify at will; this represents the view, and it affects the editor
-          too, which is why the content is prettier than the editor
-        </h4>
-        <h4>
-          Basic Editor (Unstyled) (No Wrapper) (No Element Wrappers)
-        </h4>
-        <div style={{ border: "solid 1px #ccc" }}>
-          <SlateEditor
-            id="my-editor"
-
-            // this is regarging file loading
-            // we have disabled files and images so this shouldn't happen
-            currentLoadError={null}
-            dismissCurrentLoadError={null}
-            onInsertFile={null}
-            onInsertFileFromURL={null}
-            onRetrieveFile={null}
-            onRetrieveImage={null}
-            supportedImageTypes={null}
-
-            // this validity is done via another criteria
-            // of your choosing
-            currentValid={true}
-            treeValue={treeValue}
-            value={htmlValue}
-
-            // we feed it the same feature support we used
-            features={featureSupportBasic}
-            isRichText={textTree1.rich}
-            // the given language
-            lang="en"
-
-            onChange={(value, textTreeValue) => {
-              setHtmlValue(value);
-              setTreeValue(textTreeValue);
-            }}
-
-            // this is used to define a root context
-            // used for templating, to determine
-            // the shape of the context that will be feed
-            rootContext={null}
-
-            // this is used to feed it language information
-            baseI18n={defaultBaseI18nRichInfoEnglish}
-          />
-        </div>
-      </section>
-
       <section>
         <h4>
           This editor has some wrappers, and element wrappers and they add all the missing
           functionality as well as allow to it to function correctly
+
+          The content are styled with the use of `dist.css` and the file `editor.css` gives some very basic styles
+          so that's usable but you are expected not to need to use `editor.css` and style yourself with your own
+          solution that fits your app
         </h4>
         <h4>
           The wrapper wraps the editor (gives toolbar and drawer), and the element wrappers wrap the element (gives options for a specific
@@ -132,11 +181,11 @@ function Example() {
             // we have disabled files and images so this shouldn't happen
             currentLoadError={null}
             dismissCurrentLoadError={null}
-            onInsertFile={null}
-            onInsertFileFromURL={null}
-            onRetrieveFile={null}
-            onRetrieveImage={null}
-            supportedImageTypes={null}
+            onInsertFile={onInsertFile}
+            onInsertFileFromURL={onInsertFileFromURL}
+            onRetrieveFile={onRetrieveFile}
+            onRetrieveImage={onRetrieveImage}
+            supportedImageTypes="image/*"
 
             // this validity is done via another criteria
             // of your choosing

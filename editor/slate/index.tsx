@@ -1160,13 +1160,13 @@ interface ISlateEditorProps {
    * directly to this in order to handle file insertions into the media property
    * this function is given by the handler in this way to the renderer
    */
-  onInsertFile: (file: File, isExpectingImage?: boolean) => Promise<ISlateInsertedFileInformationType>;
+  onInsertFile: (file: File, isExpectingImage?: boolean) => Promise<ISlateInsertedFileInformationType> | ISlateInsertedFileInformationType;
   /**
    * Function that usually comes from the handler and is provided via the renderer
    * directly to this in order to handle file insertions into the media property
    * this function is given by the handler in this way to the renderer
    */
-  onInsertFileFromURL: (url: string, name: string, isExpectingImage?: boolean) => Promise<ISlateInsertedFileInformationType>;
+  onInsertFileFromURL: (url: string, name: string, isExpectingImage?: boolean) => Promise<ISlateInsertedFileInformationType> | ISlateInsertedFileInformationType;
   /**
    * Function that should be specified to inform whether a file is included
    * in the current internal information
@@ -4366,7 +4366,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
 
     // return the status
     return data.status;
@@ -4416,9 +4416,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     } catch (err) {
     }
-
-    // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
   };
 
   /**
@@ -4452,9 +4449,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     } else {
       Transforms.insertNodes(this.editor, containerNode);
     }
-
-    // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
   };
 
   /**
@@ -4490,7 +4484,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4520,7 +4514,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4552,7 +4546,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4620,7 +4614,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
 
     return validState;
   }
@@ -4690,7 +4684,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
 
     // we have succeeded
     return validState;
@@ -4706,7 +4700,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, args, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4720,7 +4714,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4734,7 +4728,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4748,7 +4742,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4762,7 +4756,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   };
 
   /**
@@ -4782,7 +4776,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   }
 
   /**
@@ -4804,7 +4798,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   }
 
   /**
@@ -4828,7 +4822,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }, { at: anchor });
 
     // related to the buggy mess slate has become
-    this.onChange(this.editor.children);
+    // this.onChange(this.editor.children);
   }
 
   /**
