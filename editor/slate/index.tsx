@@ -442,6 +442,8 @@ const ALL_PROMISE = new Promise<void>(async (resolve) => {
     const allLinks = document.head.querySelectorAll("link");
     const allStyles = document.head.querySelectorAll("style");
 
+    // const stylesheetHrefPrefix = location.protocol + "//" + location.host + "/rest/resource/build";
+
     const totalStyleSheetExpectedCount = allLinks.length + allStyles.length;
 
     // now we got to see if by the time this promise is running

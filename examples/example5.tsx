@@ -43,6 +43,17 @@ const sanitized1 = sanitize({
 
 const textTree1 = deserialize(sanitized1);
 
+// YOU MAY NOTICE THAT THE EDITOR IS ABLE TO PICK UP
+// all the available rich classes, table types, containers, and just everything available
+// by reading the stylesheets
+// if you have particularly large stylesheets, do this
+// where your rich text editor css are
+// if (typeof document !== "undefined") {
+//    (window as any).SLATE_EDITOR_STYLESHEETS_PREFIX = location.protocol + "//" + location.host + "/mycssextensionlocation/"
+// }
+// yes globals are ugly but this is for performance and is dead simple
+// sometimes globals make things easier
+
 function Example() {
   // our initial value is the same as the sanitized
   // this value is for convenience is not what is used
@@ -251,14 +262,14 @@ function Example() {
 
       <section>
         <h4>
-          This raw display does not support templating
+          This raw display does not support templating (if you added an event, or templating classes it will not work here)
         </h4>
         <div className="rich-text" dangerouslySetInnerHTML={{ __html: htmlValue }} style={{ padding: "10px", border: "solid 1px #ccc" }} />
       </section>
 
       <section>
         <h4>
-          This raw display uses the reactify method and supports full templating
+          This raw display uses the reactify method and supports full templating (if you added an event or templating classes, it will only work here)
         </h4>
         <div className="rich-text">
           {renderTemplateDynamically(treeValue, templateArgs)}
