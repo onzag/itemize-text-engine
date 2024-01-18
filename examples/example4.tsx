@@ -1,14 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { deserialize } from "../serializer";
 import { IFeatureSupportOptions, sanitize } from "../sanitizer";
-import { renderTemplateDontSanitize, renderTemplateDynamically } from "../renderer";
-import { MutatingTemplateArgs, TemplateArgs } from "../serializer/template-args";
-import { IParagraph } from "../serializer/types/paragraph";
-import { IImage } from "../serializer/types/image";
-import { IUIHandlerProps } from "../serializer/base";
 import { SlateEditor, defaultBaseI18nRichInfoEnglish } from "../editor/slate";
 import { DefaultSlateWrapper, defaultWrapperI18nRichInfoEnglish } from "../editor/slate/wrapper";
+import { defaultElementWrappers } from "../editor/slate/element-wrappers";
 
 const featureSupportBasic: IFeatureSupportOptions = {
   supportedContainers: [],
@@ -118,20 +114,15 @@ function Example() {
 
       <section>
         <h4>
-          This editor has some wrappers, but no element wrappers, they both share the same state;
-          the wrappers is what brings the toolbar and the drawer, all this is configurable.
+          This editor has some wrappers, and element wrappers and they add all the missing
+          functionality as well as allow to it to function correctly
         </h4>
         <h4>
-          The wrapper wraps the editor and gives it extra functionality, in this case a toolbar and the drawer
-          however this editor is still not fully functional as there are also element wrappers, these wrap
-          singular elements to give them extra functionality; normally the drawer should be hidden for most users
-          as it contains pretty advanced functions
+          The wrapper wraps the editor (gives toolbar and drawer), and the element wrappers wrap the element (gives options for a specific
+          element, for example try inserting a title)
         </h4>
         <h4>
-          Element wrappers is what adds the missing functionality that isn't shown here
-        </h4>
-        <h4>
-          Basic Editor (Unstyled) (No Element Wrappers)
+          Basic Editor (Unstyled)
         </h4>
         <div style={{ border: "solid 1px #ccc" }}>
           <SlateEditor
@@ -179,6 +170,7 @@ function Example() {
             // the default isn't pretty at all, and you should try to configure it to have the same
             // look and feel as your app, in itemize fast prototyping it is reconfigured to use material UI
             Wrapper={DefaultSlateWrapper}
+            elementWrappers={defaultElementWrappers}
             // note how we changed this to use the one that has more details
             // which are necessary for the wrapper to function
             baseI18n={defaultWrapperI18nRichInfoEnglish}

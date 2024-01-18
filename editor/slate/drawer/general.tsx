@@ -74,6 +74,8 @@ export function DefaultWrapperDrawerTextField(props: IWrapperDrawerTextFieldProp
 }
 
 export function DefaultWrapperDrawerSelectField(props: IWrapperDrawerSelectFieldProps) {
+  // due to contrains of the native HTML select
+  // the label cannot be used in option values where an html has been given
   return (
     <div className="slateEditorWrapperDrawerSelectField">
       <label>{props.label}</label>
@@ -85,7 +87,7 @@ export function DefaultWrapperDrawerSelectField(props: IWrapperDrawerSelectField
       >
         {props.options.map(option => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {typeof option.label === "string" ? option.label : option.value}
           </option>
         ))}
       </select>
@@ -98,6 +100,9 @@ export function DefaultWrapperDrawerMultiSelectField(props: IWrapperDrawerMultiS
     const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
     props.onChange(selectedOptions);
   }, []);
+
+  // due to contrains of the native HTML select
+  // the label cannot be used in option values where an html has been given
   return (
     <div className="slateEditorWrapperDrawerMultiSelectField">
       <label>{props.label}</label>
@@ -109,7 +114,7 @@ export function DefaultWrapperDrawerMultiSelectField(props: IWrapperDrawerMultiS
       >
         {props.options.map(option => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {typeof option.label === "string" ? option.label : option.value}
           </option>
         ))}
       </select>

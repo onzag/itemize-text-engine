@@ -96,3 +96,13 @@ html[dir="rtl"] .slateEditorWrapperDrawerElementTitleIconLtrOnly {
     display: block;
     min-width: 100%;
 }
+
+.slateEditorDropdownComponent {
+    padding: 10px;
+    background-color: rgba(200,200,200,0.7);
+    border: solid 1px #ccc;
+}
+
+.slateEditorDropdownComponent .slateEditorWrapperDrawerSelectField, .slateEditorDropdownComponent .slateEditorWrapperDrawerTextField {
+    margin-top: 0;
+}

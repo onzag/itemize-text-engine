@@ -177,6 +177,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
         unblur={this.unblur}
         value={this.state.value}
         id={this.props.id}
+        displayEmpty={true}
       />
     );
   }
@@ -199,9 +200,24 @@ function DefaultDrawerTemplatingContainerBox(props: IDrawerTemplatingContainerBo
 export function TemplatingOptions(props: IDrawerContainerProps) {
   // we need to pick these to make the option list
   const currentNode = props.state.currentSelectedElement as RichElement;
-  const allEachContexts: ISingleTemplatingElementOption[] = [];
-  const allContexts: ISingleTemplatingElementOption[] = [];
-  const allIfConditions: ISingleTemplatingElementOption[] = [];
+  const allEachContexts: ISingleTemplatingElementOption[] = [
+    {
+      label: " - ",
+      value: "",
+    },
+  ];
+  const allContexts: ISingleTemplatingElementOption[] = [
+    {
+      label: " - ",
+      value: "",
+    },
+  ];
+  const allIfConditions: ISingleTemplatingElementOption[] = [
+    {
+      label: " - ",
+      value: "",
+    },
+  ];
 
   // if we have a context, otherwise without context there are no options
   const currentSelectElementForSelectContext = getContextFor(

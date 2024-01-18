@@ -458,6 +458,7 @@ export function EditorDropdown(props: IEditorDropdown) {
         containedWithinBox={props.containWithinBox}
         props={{
           ["data-unblur"]: true,
+          style: props.containWithinBox ? null : style,
         }}
         sizable={!!props.dropdownSizable}
         ref={props.containWithinBox ? null : dropdownRef}
@@ -507,6 +508,7 @@ export function EditorDropdown(props: IEditorDropdown) {
             ...(props.dropdownComponentWrapperProps?.style || {})
           }
         }}
+        ref={boxRef}
       >
         {props.children}
       </Wrapper>

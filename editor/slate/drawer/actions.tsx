@@ -210,6 +210,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
         resetBlur={this.resetBlur}
         unblur={this.unblur}
         value={this.state.value}
+        displayEmpty={true}
       />
     );
   }
@@ -284,6 +285,14 @@ export function ActionsOptions(props: IDrawerContainerProps) {
       }
     }).filter((v) => !!v));
   }
+
+  if (allOptions) {
+    allOptions = [{
+      value: "",
+      label: " - ",
+      primary: false,
+    }].concat(allOptions);
+  };
 
   const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
 

@@ -460,7 +460,7 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
   );
 }
 
-export const materialUIElementWrappers: ISlateEditorElementWrappers = {
+export const defaultElementWrappers: ISlateEditorElementWrappers = {
   components: {
     link: (props: IDefaultSlateElementWrappersProps) => {
       const [valid, setValid] = useState(true);
@@ -559,6 +559,9 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
 
       return (
         <EditorDropdown
+          DropdownComponent={props.DropdownComponent}
+          DropdownComponentBox={props.DropdownComponentBox}
+          DropdownComponentWrapper={props.DropdownComponentWrapper}
           dropdownComponentWrapperTag="span"
           isOpen={props.isSelected}
           dropdown={
@@ -726,13 +729,12 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               options={["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
                 return {
                   label: <Element>{props.baseI18n.title}</Element>,
-                  value: Element,
+                  value: Element ? Element : " - ",
                 }
               })}
               resetBlur={null}
               unblur={null}
-              value={(props.element as IContainer).containerType || ""}
-              displayEmpty={true}
+              value={(props.element as ITitle).titleType || "h1"}
             />
           }
         >
