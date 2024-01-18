@@ -1746,7 +1746,11 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
       // if it's an unblurred target, such as the toolbar
       // or the drawer
       if (this.isUnblurred(target)) {
-        if (target.tagName !== "INPUT" && target.tagName !== "SELECT") {
+        if (
+          target.tagName !== "INPUT" &&
+          target.tagName !== "SELECT" &&
+          target.tagName !== "OPTION"
+        ) {
           // stop from losing focus
           e.preventDefault();
         }

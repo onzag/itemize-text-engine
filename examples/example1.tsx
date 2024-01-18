@@ -15,10 +15,10 @@ const TEXT_FROM_SERVER_6 = "This is just\nSome plain text";
 const sanitized1 = sanitize({
   fileResolver: null,
 }, {
-  supportedContainers: [],
-  supportedCustoms: [],
-  supportedRichClasses: [],
-  supportedTables: [],
+  supportedContainers: null,
+  supportedCustoms: null,
+  supportedRichClasses: null,
+  supportedTables: null,
   supportsContainers: true,
   supportsCustom: true,
   supportsCustomStyles: true,
@@ -40,10 +40,10 @@ const sanitized1 = sanitize({
 const sanitized2 = sanitize({
   fileResolver: null,
 }, {
-  supportedContainers: [],
-  supportedCustoms: [],
-  supportedRichClasses: [],
-  supportedTables: [],
+  supportedContainers: null,
+  supportedCustoms: null,
+  supportedRichClasses: null,
+  supportedTables: null,
   supportsContainers: true,
   supportsCustom: true,
   supportsCustomStyles: true,

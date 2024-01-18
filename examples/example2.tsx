@@ -8,10 +8,10 @@ import { IParagraph } from "../serializer/types/paragraph";
 import { IImage } from "../serializer/types/image";
 
 const featureSupport: IFeatureSupportOptions = {
-  supportedContainers: [],
-  supportedCustoms: [],
-  supportedRichClasses: [],
-  supportedTables: [],
+  supportedContainers: null,
+  supportedCustoms: null,
+  supportedRichClasses: null,
+  supportedTables: null,
   supportsContainers: true,
   supportsCustom: true,
   supportsCustomStyles: true,

@@ -7,10 +7,10 @@ import { TemplateArgs } from "../serializer/template-args";
 import { IUIHandlerProps } from "../serializer/base";
 
 const featureSupport: IFeatureSupportOptions = {
-  supportedContainers: [],
-  supportedCustoms: [],
-  supportedRichClasses: [],
-  supportedTables: [],
+  supportedContainers: null,
+  supportedCustoms: null,
+  supportedRichClasses: null,
+  supportedTables: null,
   supportsContainers: true,
   supportsCustom: true,
   supportsCustomStyles: true,

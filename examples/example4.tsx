@@ -7,10 +7,10 @@ import { DefaultSlateWrapper, defaultWrapperI18nRichInfoEnglish } from "../edito
 import { defaultElementWrappers } from "../editor/slate/element-wrappers";
 
 const featureSupportBasic: IFeatureSupportOptions = {
-  supportedContainers: [],
-  supportedCustoms: [],
-  supportedRichClasses: [],
-  supportedTables: [],
+  supportedContainers: null,
+  supportedCustoms: null,
+  supportedRichClasses: null,
+  supportedTables: null,
   supportsContainers: true,
   supportsCustom: true,
   supportsCustomStyles: true,

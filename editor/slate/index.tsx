@@ -369,8 +369,10 @@ let ALL_IS_LOADED: boolean = false;
 function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
   // so first we split within the rules
   Array.from(stylesheet.cssRules).forEach((r) => {
-    if (r instanceof CSSMediaRule || (r as any).cssRules) {
+    if (r instanceof CSSMediaRule) {
       calculateStylesheet(r as CSSMediaRule);
+      return;
+    } else if (!(r instanceof CSSStyleRule)) {
       return;
     }
 
@@ -437,43 +439,118 @@ const ALL_PROMISE = new Promise<void>(async (resolve) => {
     return;
   }
   if (typeof document !== "undefined") {
-    const stylesheetHrefPrefix = location.protocol + "//" + location.host + "/rest/resource/build";
+    const allLinks = document.head.querySelectorAll("link");
+    const allStyles = document.head.querySelectorAll("style");
+
+    const totalStyleSheetExpectedCount = allLinks.length + allStyles.length;
+
     // now we got to see if by the time this promise is running
     // it is already done loading
-    const foundPreloadedStylesheet =
-      document.styleSheets && Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith(stylesheetHrefPrefix));
+    const foundPreloadedStylesheets =
+      document.styleSheets && Array.from(document.styleSheets).filter((s) => {
+        if ((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX) {
+          return s.href && s.href.startsWith((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX)
+        } else {
+          return true;
+        }
+      });
+
+    const allIsLoaded = foundPreloadedStylesheets?.length === totalStyleSheetExpectedCount;
 
     // if we find it and use it to calculate it
-    if (foundPreloadedStylesheet) {
+    if (allIsLoaded) {
       ALL_IS_LOADED = true;
-      calculateStylesheet(foundPreloadedStylesheet);
+      foundPreloadedStylesheets.forEach((s) => {
+        calculateStylesheet(s);
+      });
       resolve();
 
       // otherwise we need to wait for the link to load
     } else {
-      const allLinks = document.head.querySelectorAll("link");
-      const foundStylesheetNode = Array.from(allLinks).find((s) => s.href.startsWith(stylesheetHrefPrefix));
+      const foundStylesheetNodes = Array.from(allLinks).filter((s) => {
+        if ((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX) {
+          return s.href && s.href.startsWith((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX)
+        } else {
+          return true;
+        }
+      });
+      const foundStyleNodes = Array.from(allStyles).filter(() => {
+        if ((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX) {
+          return false;
+        } else {
+          return true;
+        }
+      });
 
       // if we don't find a base css build, then we mark it as done
-      if (!foundStylesheetNode) {
+      if (foundStylesheetNodes.length === 0 && foundStyleNodes.length === 0) {
         ALL_IS_LOADED = true;
         resolve();
       } else {
-        // otherwise we set up a onload callback
-        foundStylesheetNode.addEventListener("load", () => {
-          // and once we are loaded we want to grab the css stylesheet
-          const foundLoadedStyleSheet =
-            document.styleSheets &&
-            Array.from(document.styleSheets).find((s) => s.href && s.href.startsWith(stylesheetHrefPrefix));
-          // mark it as loaded
-          ALL_IS_LOADED = true;
+        let totalLoaded = 0;
 
-          // process it
-          if (foundLoadedStyleSheet) {
-            calculateStylesheet(foundLoadedStyleSheet);
+        // otherwise we set up a onload callback
+        foundStylesheetNodes.forEach((foundStylesheetNode) => {
+          const foundLoadedStyleSheetAlready =
+            document.styleSheets &&
+            Array.from(document.styleSheets).find((s) => s.href === foundStylesheetNode.href);
+
+          if (!foundLoadedStyleSheetAlready) {
+            foundStylesheetNode.addEventListener("load", () => {
+              // and once we are loaded we want to grab the css stylesheet
+              const foundLoadedStyleSheet =
+                document.styleSheets &&
+                Array.from(document.styleSheets).find((s) => s.href === foundStylesheetNode.href);
+
+              // process it
+              if (foundLoadedStyleSheet) {
+                calculateStylesheet(foundLoadedStyleSheet);
+              }
+
+              totalLoaded++;
+              if (totalLoaded === totalStyleSheetExpectedCount) {
+                ALL_IS_LOADED = true;
+                resolve();
+              }
+            });
+          } else {
+            calculateStylesheet(foundLoadedStyleSheetAlready);
+
+            totalLoaded++;
+            if (totalLoaded === totalStyleSheetExpectedCount) {
+              ALL_IS_LOADED = true;
+              resolve();
+            }
           }
-          // and resolve
-          resolve();
+        });
+
+        foundStyleNodes.forEach((foundStyleNode) => {
+          const foundLoadedStyleSheetAlready =
+            document.styleSheets &&
+            Array.from(document.styleSheets).find((s) => s === foundStyleNode.sheet);
+
+          if (!foundLoadedStyleSheetAlready) {
+            foundStyleNode.addEventListener("load", () => {
+
+              if (foundStyleNode.sheet) {
+                calculateStylesheet(foundStyleNode.sheet);
+              }
+
+              totalLoaded++;
+              if (totalLoaded === totalStyleSheetExpectedCount) {
+                ALL_IS_LOADED = true;
+                resolve();
+              }
+            });
+          } else {
+            calculateStylesheet(foundLoadedStyleSheetAlready);
+
+            totalLoaded++;
+            if (totalLoaded === totalStyleSheetExpectedCount) {
+              ALL_IS_LOADED = true;
+              resolve();
+            }
+          }
         });
       }
     }
@@ -2782,8 +2859,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextProps.isRichText !== this.props.isRichText ||
       nextProps.rootContext !== this.props.rootContext ||
       nextProps.baseI18n !== this.props.baseI18n ||
-      !equals(nextState.currentTextAnchor, this.state.currentTextAnchor, {strict: true}) ||
-      !equals(nextState.currentSelectedTextAnchor !== this.state.currentSelectedTextAnchor, {strict: true}) ||
+      !equals(nextState.currentTextAnchor, this.state.currentTextAnchor, { strict: true }) ||
+      !equals(nextState.currentSelectedTextAnchor !== this.state.currentSelectedTextAnchor, { strict: true }) ||
       nextState.currentRootContext !== this.state.currentRootContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
       nextProps.elementWrappers !== this.props.elementWrappers ||
