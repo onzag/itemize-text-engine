@@ -931,6 +931,17 @@ export function normalize(
 }
 
 interface ICustomExecution {
+  /**
+   * Determines whether the normalizer
+   * is actually working on the original value that is being fed and is modifying it
+   * when using the normalizeElement function the root is passed to it that is being
+   * asked to normalize, and that value is expected to be mutated, if the value isn't mutated
+   * because the editor works with something else internally determine this as false
+   * and allow the editor to keep its own state
+   * 
+   * This will generate a copy of the tree that is kept in sync as the secondary
+   * execution in order to keep it updated using the standard normalizer mechanism
+   */
   workOnOriginal: boolean;
   updateNodeAt: (path: number[], v: Partial<RichElement | IText>) => void,
   deleteNodeAt: (path: number[]) => void,
@@ -1107,7 +1118,7 @@ function normalizeSpacing(
           );
           secondaryExecution && secondaryExecution.insertNodeAt(
             path,
-            textReference,
+            shallowElementCopy(textReference),
             // insert where we are now and push us forwards
             actualIndex,
           );
@@ -1135,7 +1146,7 @@ function normalizeSpacing(
           );
           secondaryExecution && secondaryExecution.insertNodeAt(
             path,
-            textReference,
+            shallowElementCopy(textReference),
             // insert ahead of where we are now and push everything else
             // forwards
             actualIndex + 1,
@@ -1203,7 +1214,7 @@ function normalizeSpacing(
     );
     secondaryExecution && secondaryExecution.insertNodeAt(
       path,
-      nodeToInsert,
+      shallowElementCopy(nodeToInsert),
       0,
     );
   } else if (element.children.length >= 2) {
@@ -1261,14 +1272,14 @@ function isIgnoredNode(path: number[], specialRules: ISpecialRules) {
   });
 }
 
-function shallowRootCopy<T>(
+export function shallowElementCopy<T>(
   element: T,
 ): T {
   const newElement: any = {}
   const mergable = isText(element as any) || isMergable(element as any);
   Object.keys(element).forEach((key) => {
     if (key === "children") {
-      newElement.children = (element as any as RichElement).children.map(shallowRootCopy);
+      newElement.children = (element as any as RichElement).children.map(shallowElementCopy);
     } else if (
       key === "text"
     ) {
@@ -1321,7 +1332,7 @@ export function normalizeElement(
   let executionElement = element;
   let secondaryExecution: ICustomExecution = null;
   if (!primaryExecution.workOnOriginal) {
-    executionRoot = shallowRootCopy(root);
+    executionRoot = shallowElementCopy(root);
     secondaryExecution = standardExecFn(executionRoot);
     executionElement = getNodeFor(path, executionRoot) as RichElement;
   }
@@ -1410,7 +1421,7 @@ function internalNormalizeElement(
           offset -= 1;
         } else {
           primaryExecution.wrapNodeAt(childrenPath, wrapper);
-          secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper);
+          secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper.map(shallowElementCopy));
         }
       }
     } else {
@@ -1485,7 +1496,7 @@ function internalNormalizeElement(
             offset -= 1;
           } else {
             primaryExecution.wrapNodeAt(childrenPath, wrapper);
-            secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper);
+            secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper.map(shallowElementCopy));
             if (!isTextDeniedInSuperBlock) {
               internalNormalizeElement(
                 element.children[actualChildIndex] as RichElement,

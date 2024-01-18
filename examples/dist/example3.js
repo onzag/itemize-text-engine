@@ -1,6 +1,6 @@
 import {
   renderTemplateDynamically
-} from "/dist/commons-6NDWBSM5.js";
+} from "/dist/commons-I2VEM3TR.js";
 import {
   TemplateArgs,
   __toESM,
@@ -8,7 +8,7 @@ import {
   require_react,
   require_react_dom,
   sanitize
-} from "/dist/commons-EJSJQMMI.js";
+} from "/dist/commons-2PRWFEI7.js";
 
 // example3.tsx
 var import_react = __toESM(require_react());

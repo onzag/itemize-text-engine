@@ -3723,6 +3723,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       if (tableElement.type === "table") {
         tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
+          const isLastElementInTableBody = theadOrTbodyOrTFootIndex === tableElement.children.length - 1;
           theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
             const column: ITd = {
               type: "td",
@@ -3740,7 +3741,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
             // only allow to normalize at our last insert
             // otherwise the normalizer will get crazy
-            this.preventNormalize = rowIndex !== theadOrTbodyOrTfoot.children.length - 1;
+            this.preventNormalize = isLastElementInTableBody ? rowIndex !== theadOrTbodyOrTfoot.children.length - 1 : true;
             Transforms.insertNodes(this.editor, column, { at: insertPoint });
             this.preventNormalize = false;
           });
@@ -3799,12 +3800,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       if (tableElement.type === "table") {
         tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
+          const isLastElementInTableBody = theadOrTbodyOrTFootIndex === tableElement.children.length - 1;
           theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
             const deletePoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, targetIndex];
 
             // only allow to normalize at our last insert
             // otherwise the normalizer will get crazy
-            this.preventNormalize = rowIndex !== theadOrTbodyOrTfoot.children.length - 1;
+            this.preventNormalize = isLastElementInTableBody ? rowIndex !== theadOrTbodyOrTfoot.children.length - 1 : true;
             Transforms.delete(this.editor, { at: deletePoint });
             this.preventNormalize = false;
           });

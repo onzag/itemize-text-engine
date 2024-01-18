@@ -420,9 +420,20 @@ export function registerTableElements(registry: ISerializationRegistryType) {
       tbodyElement.children.forEach((row, i2) => {
         const shouldBeColumnTag = tbodyElement.type === "thead" ? "th" : "td";
         if (row.children.length !== maxColumnCount) {
-          const newNode: ITd | ITh = { type: shouldBeColumnTag, children: [STANDARD_PARAGRAPH()] };
-          primaryExecution.insertNodeAt([...path, i, i2], newNode , row.children.length);
-          secondaryExecution && secondaryExecution.insertNodeAt([...path, i, i2], newNode, row.children.length);
+          primaryExecution.insertNodeAt(
+            [...path, i, i2],
+            {
+              type: shouldBeColumnTag, children: [STANDARD_PARAGRAPH()],
+            },
+            row.children.length,
+          );
+          secondaryExecution && secondaryExecution.insertNodeAt(
+            [...path, i, i2],
+            {
+              type: shouldBeColumnTag, children: [STANDARD_PARAGRAPH()],
+            },
+            row.children.length,
+          );
         }
       });
     }
