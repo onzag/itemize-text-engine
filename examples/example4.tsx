@@ -59,6 +59,19 @@ function Example() {
 
       <section>
         <h4>
+          This is a very basic editor, with no added Wrappers, it's basically useless other
+          than from editing basic text, and not recommended to use; note that all editors are mostly unstyled
+          while there are styles associated with the editor, they are mostly meant to be a reference of what
+          each component is supposed to be, the `editor.css` file constains these styles, but it's not recommended
+          to use, the editor is supposed to be configured into the look and theme that is wanted
+          there's no default theme, it's just plain and ugly HTML, but it can be made to look pretty
+        </h4>
+        <h4>
+          The contents themselves however are more stylized and the `dist.css` file or the `original.scss` file
+          is expected to be included in production, modify at will; this represents the view, and it affects the editor
+          too, which is why the content is prettier than the editor
+        </h4>
+        <h4>
           Basic Editor (Unstyled) (No Wrapper) (No Element Wrappers)
         </h4>
         <div style={{ border: "solid 1px #ccc" }}>
@@ -104,6 +117,19 @@ function Example() {
       </section>
 
       <section>
+        <h4>
+          This editor has some wrappers, but no element wrappers, they both share the same state;
+          the wrappers is what brings the toolbar and the drawer, all this is configurable.
+        </h4>
+        <h4>
+          The wrapper wraps the editor and gives it extra functionality, in this case a toolbar and the drawer
+          however this editor is still not fully functional as there are also element wrappers, these wrap
+          singular elements to give them extra functionality; normally the drawer should be hidden for most users
+          as it contains pretty advanced functions
+        </h4>
+        <h4>
+          Element wrappers is what adds the missing functionality that isn't shown here
+        </h4>
         <h4>
           Basic Editor (Unstyled) (No Element Wrappers)
         </h4>
