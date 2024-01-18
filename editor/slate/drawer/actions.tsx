@@ -7,6 +7,7 @@
 import React from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import { Path } from "slate";
+import { DefaultWrapperDrawerInternalPanelWrapper, DefaultWrapperDrawerSelectField, IWrapperDrawerSelectFieldProps } from "./general";
 
 /**
  * This is the list of events that we support
@@ -41,7 +42,7 @@ const EVENTS = [
  */
 interface ISingleActionOption {
   value: string;
-  label: string | React.ReactNode;
+  label: string;
   primary: boolean;
 }
 
@@ -86,6 +87,13 @@ interface ISingleActionProps {
    * @param anchor in which anchor it generated
    */
   onChange: (key: string, value: string, anchor: Path) => void;
+
+  /**
+   * id for the action space
+   */
+  id: string;
+
+  SelectField: React.ComponentType<IWrapperDrawerSelectFieldProps>;
 }
 
 /**
@@ -149,6 +157,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     super(props);
 
     this.onActionValueChange = this.onActionValueChange.bind(this);
+    this.onDirectChange = this.onDirectChange.bind(this);
 
     this.state = {
       value: props.actionValue || "",
@@ -161,10 +170,12 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
    * Triggers when the selector value has changed to something else
    * @param e the change event
    */
-  public onActionValueChange(e: React.ChangeEvent<HTMLInputElement>) {
+  public onActionValueChange(e: React.ChangeEvent<HTMLSelectElement>) {
     // it might be null
-    const newValue = e.target.value || null;
+    this.onDirectChange(e.target.value);
+  }
 
+  public onDirectChange(newValue: string = null) {
     // update the state
     this.setState({
       value: newValue || "",
@@ -188,59 +199,18 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
    * The render function for the component
    */
   public render() {
+    const SelectField = this.props.SelectField || DefaultWrapperDrawerSelectField;
     return (
-      <Box>
-        <AltBadgeReactioner
-          action="focus"
-          reactionKey="n"
-          priority={3}
-          selector="div[tabindex]"
-          fullWidth={true}
-        >
-          <FormControl
-            variant="filled"
-            fullWidth={true}
-          >
-            <InputLabel
-              htmlFor={"slate-wrapper-action-entry-for-" + this.props.name}
-              shrink={true}
-            >
-              {this.props.name}
-            </InputLabel>
-            <Select
-              value={this.state.value}
-              onChange={this.onActionValueChange}
-              displayEmpty={true}
-              variant="filled"
-              input={
-                <FilledInput
-                  id={"slate-wrapper-action-entry-for-" + this.props.name}
-                  placeholder={this.props.name}
-                />
-              }
-              onOpen={this.unblur}
-              onClose={this.resetBlur}
-            >
-              <MenuItem value="">
-                <em>{" - "}</em>
-              </MenuItem>
-              {
-                // render the valid values that we display and choose
-                this.props.options.map((vv) => {
-                  // the i18n value from the i18n data
-                  return <MenuItem
-                    key={vv.value}
-                    value={vv.value}
-                    sx={vv.primary ? style.optionPrimary : null}
-                  >{
-                      vv.label
-                    }</MenuItem>;
-                })
-              }
-            </Select>
-          </FormControl>
-        </AltBadgeReactioner>
-      </Box>
+      <SelectField
+        id={this.props.id}
+        label={this.props.name}
+        onChangeByEvent={this.onActionValueChange}
+        onChangeByValue={this.onDirectChange}
+        options={this.props.options}
+        resetBlur={this.resetBlur}
+        unblur={this.unblur}
+        value={this.state.value}
+      />
     );
   }
 }
@@ -287,7 +257,7 @@ export function ActionsOptions(props: IDrawerContainerProps) {
     // now we can return it and give it the label it holds
     return {
       value: p,
-      label: value.label,
+      label: typeof value.label === "function" ? value.label() : value.label,
       primary: props.state.currentRootContext !== currentNodeContext,
     }
   }).filter((v) => !!v) : [];
@@ -309,17 +279,17 @@ export function ActionsOptions(props: IDrawerContainerProps) {
       // now we can return it and give it the label it holds
       return {
         value: p,
-        label: value.label,
+        label: typeof value.label === "function" ? value.label() : value.label,
         primary: false,
       }
     }).filter((v) => !!v));
   }
 
-  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || "div";
+  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
 
   // now we can return the whole box
   return (
-    <Box sx={style.box}>
+    <WrapperDrawerInternalPanelWrapper>
       {
         EVENTS.map((v, index) => (
           <SingleAction
@@ -330,9 +300,11 @@ export function ActionsOptions(props: IDrawerContainerProps) {
             anchor={currentNodeAnchor}
             onChange={props.helpers.setAction}
             groupIndex={index}
+            id={"action-" + v}
+            SelectField={props.WrapperDrawerSelectField}
           />
         ))
       }
-    </Box>
+    </WrapperDrawerInternalPanelWrapper>
   );
 }

@@ -7,12 +7,11 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
-// import { GeneralOptions } from "./general";
-// import { ActionsOptions } from "./actions";
-// import { TemplatingOptions } from "./templating";
 import { INodeInfo, getInfoFor } from "../..";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
+import { ActionsOptions } from "./actions";
+import { TemplatingOptions } from "./templating";
 
 
 export interface IWrapperDrawerElementTitleProps {
@@ -142,12 +141,12 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
       case "STYLES":
         infoPanel = <StylesOptions {...props} />;
         break;
-      // case "ACTIONS":
-      //   infoPanel = <ActionsOptions {...props} />;
-      //   break;
-      // case "TEMPLATING":
-      //   infoPanel = <TemplatingOptions {...props} />;
-      //   break;
+      case "ACTIONS":
+        infoPanel = <ActionsOptions {...props} />;
+        break;
+      case "TEMPLATING":
+        infoPanel = <TemplatingOptions {...props} />;
+        break;
     }
 
     const selectedNodeInfo = getInfoFor(

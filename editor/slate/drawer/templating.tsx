@@ -6,39 +6,9 @@
 
 import { getContextFor, RichElement } from "../../../serializer";
 import React, { useCallback } from "react";
-import type { IDrawerContainerProps, IDrawerSingleTemplatingElementProps, IDrawerTemplatingContainerBoxProps, ISingleTemplatingElementOption } from "../wrapper";
+import type { IDrawerContainerProps, IDrawerTemplatingContainerBoxProps, ISingleTemplatingElementOption } from "../wrapper";
 import { Path } from "slate";
-
-function DefaultDrawerSingleTemplatingElement(props: IDrawerSingleTemplatingElementProps) {
-  const onChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    props.onChangeByEvent(e);
-    props.resetBlur();
-  }, [props.onChangeByEvent]);
-  return (
-    <div className="slateEditorTemplatingElementSelector">
-      <select
-        onChange={onChange}
-        onClick={props.unblur}
-        value={props.value}
-        placeholder={props.i18nName}
-      >
-        <option value="">
-          <em>{" - "}</em>
-        </option>
-        {
-          // render the valid values that we display and choose
-          props.options.map((vv) => {
-            // the i18n value from the i18n data
-            return <option key={vv.value} value={vv.value}>{
-              vv.label
-            }</option>;
-          })
-        }
-      </select>
-    </div>
-  );
-}
-
+import { DefaultWrapperDrawerSelectField, IWrapperDrawerSelectFieldProps } from "./general";
 
 /**
  * The single templating element option props are the props
@@ -75,7 +45,12 @@ interface ISingleTemplatingElementProps {
    * The change event that triggers once the select value changes
    */
   onChange: (value: string, anchor: Path) => void;
-  DrawerSingleTemplatingElement: React.ComponentType<IDrawerSingleTemplatingElementProps>;
+  /**
+   * The id that this represents
+   */
+  id: string;
+
+  SelectField: React.ComponentType<IWrapperDrawerSelectFieldProps>;
 }
 
 /**
@@ -171,7 +146,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
  * in the field
  * @param e the change event
  */
-  public onChangeByEvent(e: React.ChangeEvent<HTMLInputElement>) {
+  public onChangeByEvent(e: React.ChangeEvent<HTMLSelectElement>) {
     // grab the new value from the event
     const newValue = e.target.value || null;
 
@@ -191,16 +166,17 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
    */
   public render() {
     // here we do the return with the box
-    const DrawerSingleTemplatingElement = this.props.DrawerSingleTemplatingElement || DefaultDrawerSingleTemplatingElement;
+    const SelectField = this.props.SelectField || DefaultWrapperDrawerSelectField;
     return (
-      <DrawerSingleTemplatingElement
-        i18nName={this.props.i18nName}
-        onChange={this.onChange}
+      <SelectField
+        label={this.props.i18nName}
         onChangeByEvent={this.onChangeByEvent}
+        onChangeByValue={this.onChange}
         options={this.props.options}
         resetBlur={this.resetBlur}
         unblur={this.unblur}
         value={this.state.value}
+        id={this.props.id}
       />
     );
   }
@@ -246,7 +222,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
       // now we can build the option
       const option = {
         value: p,
-        label: value.label,
+        label: typeof value.label === "function" ? value.label() : value.label,
       };
 
       allContexts.push(option);
@@ -274,7 +250,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
       // now we can build the option
       const option = {
         value: p,
-        label: value.label,
+        label: typeof value.label === "function" ? value.label() : value.label,
       };
 
       if (isValidForBoolean) {
@@ -326,7 +302,8 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         options={allContexts}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setContext}
-        DrawerSingleTemplatingElement={props.DrawerSingleTemplatingElement}
+        SelectField={props.WrapperDrawerSelectField}
+        id="render-context"
       />
       <SingleTemplatingElement
         name="if"
@@ -335,7 +312,8 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         options={allIfConditions}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setIfCondition}
-        DrawerSingleTemplatingElement={props.DrawerSingleTemplatingElement}
+        SelectField={props.WrapperDrawerSelectField}
+        id="render-if"
       />
       <SingleTemplatingElement
         name="each"
@@ -344,7 +322,8 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         options={allEachContexts}
         anchor={props.state.currentSelectedElementAnchor}
         onChange={props.helpers.setForEach}
-        DrawerSingleTemplatingElement={props.DrawerSingleTemplatingElement}
+        SelectField={props.WrapperDrawerSelectField}
+        id="render-for-each"
       />
     </DrawerTemplatingContainerBox>
   );

@@ -30,7 +30,7 @@ export interface IWrapperDrawerSelectFieldProps {
   onChangeByEvent: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onChangeByValue: (v: string) => void;
   id: string;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; primary?: boolean }>;
   unblur: () => void;
   resetBlur: () => void;
 }
@@ -40,7 +40,7 @@ export interface IWrapperDrawerMultiSelectFieldProps {
   label: string;
   onChange: (v: string[]) => void;
   id: string;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; primary?: boolean  }>;
   unblur: () => void;
   resetBlur: () => void;
 }

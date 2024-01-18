@@ -501,11 +501,6 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   DrawerWrapper?: React.ComponentType<IEditorWrapperProps>;
 
   /**
-   * These are select elements for options when using template settings
-   */
-  DrawerSingleTemplatingElement?: React.ComponentType<IDrawerSingleTemplatingElementProps>;
-
-  /**
    * Used for displaying dialogs with errors
    */
   Dialog?: React.ComponentType<IDialogComponentProps>;
@@ -579,26 +574,8 @@ export interface IDrawerTemplatingContainerBoxProps {
  */
 export interface ISingleTemplatingElementOption {
   value: string;
-  label: string | React.ReactNode;
+  label: string;
 }
-
-export interface IDrawerSingleTemplatingElementProps {
-  i18nName: string;
-  value: string;
-  onChange: (value: string) => void;
-  onChangeByEvent: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  /**
-   * causes the whole text editor to be unable to blur if it's out of focus
-   * and keep the focus
-   */
-  unblur: () => void;
-  /**
-   * resets the blur status
-   */
-  resetBlur: () => void;
-  options: ISingleTemplatingElementOption[];
-}
-
 
 export interface IEditorWrapperProps extends IDefaultSlateWrapperProps {
   drawerOpen: boolean;

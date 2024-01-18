@@ -88,6 +88,11 @@ html[dir="rtl"] .slateEditorWrapperDrawerElementTitleIconLtrOnly {
     cursor: pointer;
 }
 
-.slateEditorWrapperDrawerTextField {
+.slateEditorWrapperDrawerTextField, .slateEditorWrapperDrawerMultiSelectField, .slateEditorWrapperDrawerSelectField {
     margin-top: 10px;
+}
+
+.slateEditorWrapperDrawerMultiSelectField select, .slateEditorWrapperDrawerSelectField select {
+    display: block;
+    min-width: 100%;
 }
