@@ -925,6 +925,10 @@ export interface ISlateEditorWrapperElementProps {
    * The feature support
    */
   featureSupport: IAccessibleFeatureSupportOptions;
+  /**
+   * the base i18n given
+   */
+  baseI18n: IBaseI18nRichTextInfo;
 }
 
 /**
@@ -3202,6 +3206,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
                   primarySelection={isPrimary}
                   isSelected={isSelected}
                   featureSupport={this.getFeatureSupport()}
+                  baseI18n={this.props.baseI18n}
                   {...this.props.elementWrappersArgs}
                 >
                   {toReturn}

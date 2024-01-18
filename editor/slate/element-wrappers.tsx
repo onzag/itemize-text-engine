@@ -1,59 +1,14 @@
 import type { ISlateEditorElementWrappers, ISlateEditorInternalStateType, ISlateEditorWrapperElementProps } from ".";
 import React, { useCallback, useEffect, useState } from "react";
-import { IconButton } from "@mui/material";
-import { ILink } from "../../../internal/text/serializer/types/link";
-import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
-import FilledInput from "@mui/material/FilledInput";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-import type { IVideo } from "../../../internal/text/serializer/types/video";
-import { IContainer } from "../../../internal/text/serializer/types/container";
-import TableRowsIcon from '@mui/icons-material/TableRows';
-import ViewWeekIcon from '@mui/icons-material/ViewWeek';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import { EditorDropdown } from "../editor-dropdown";
-import { ITable } from "../../../internal/text/serializer/types/table";
-import { ITitle } from "../../../internal/text/serializer/types/title";
-import { IImage } from "../../../internal/text/serializer/types/image";
-import { AltBadgeReactioner } from "../alt-badge-reactioner";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-
-const styles = {
-  linkTemplateOptionsBox: {
-    display: "flex",
-    flexDirection: "column",
-    padding: "1rem 0 0 0",
-  },
-  linkTemplateOptionsText: {
-    textAlign: "center",
-    color: "#aaa",
-    paddingBottom: "1rem",
-  },
-  optionPrimary: {
-    fontWeight: 700,
-    color: "#1b5e20",
-  },
-  whiteBackgroundInput: {
-    backgroundColor: "white",
-  },
-  upsideDown: {
-    transform: "scaleY(-1)",
-  },
-  fixedWidthInput: {
-    width: 200,
-  },
-  iconAddRemove: {
-    position: "absolute",
-    right: 0,
-    fontSize: "15px",
-  },
-}
+import { ILink } from "../../serializer/types/link";
+import type { IVideo } from "../../serializer/types/video";
+import { IContainer } from "../../serializer/types/container";
+import { EditorDropdown, IDropdownComponentBoxProps, IDropdownComponentProps, IDropdownComponentWrapperProps } from "../editor-dropdown";
+import { ITable } from "../../serializer/types/table";
+import { ITitle } from "../../serializer/types/title";
+import { IImage } from "../../serializer/types/image";
+import { DefaultWrapperDrawerSelectField, DefaultWrapperDrawerTextField, IWrapperDrawerCheckBoxProps, IWrapperDrawerMultiSelectFieldProps, IWrapperDrawerSelectFieldProps, IWrapperDrawerTextFieldProps } from "./drawer/general";
+import { IWrapperI18nRichTextInfo } from "./wrapper";
 
 /**
  * Represents an option for the templated values
@@ -65,31 +20,88 @@ interface ITemplateOption {
   primary: boolean;
 };
 
-export interface IMaterialUIWrapperElementProps extends ISlateEditorWrapperElementProps {
+export interface IElementWrapperButton {
+  label: string;
+  id: string;
+  disabled: boolean;
+  selected?: boolean;
+  onClick: () => void;
+}
+
+function DefaultElementWrapperButtonComponent(props: IElementWrapperButton) {
+  return (
+    <button
+      className={"slateEditorElementWrapperButton " + (props.selected ? " selected" : "")}
+      disabled={props.disabled}
+      onClick={props.onClick}
+    >
+      {props.label}
+    </button >
+  );
+}
+
+export interface IFieldWrapperForMoreOptions {
+  label: string;
+  children: React.ReactNode;
+}
+
+function DefaultFieldWrapperForMoreOptions(props: IFieldWrapperForMoreOptions) {
+  return (
+    <div className="slateEditorFieldWrapperForMoreOptions">
+      <div className="slateEditorFieldWrapperForMoreOptionsLabel">{props.label}</div>
+      <div className="slateEditorFieldWrapperForMoreOptionsChildren">{props.children}</div>
+    </div>
+  )
+}
+
+export interface IDefaultSlateElementWrappersProps extends ISlateEditorWrapperElementProps {
   /**
- * A generic error message
- */
-  i18nGenericError: string;
-  /**
-   * A generic ok
+   * Used to make text input fields
    */
-  i18nOk: string;
-  /**
-   * The whole of the i18n rich information that is given by default
-   */
-  i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+  ElementWrapperTextField?: React.ComponentType<IWrapperDrawerTextFieldProps>;
+
+  // /**
+  //  * Used to make checkbox input fields
+  //  */
+  // ElementWrapperCheckboxField?: React.ComponentType<IWrapperDrawerCheckBoxProps>;
 
   /**
-   * The priority to use in accessibility
-   * try to keep it in line with the wrappers
-   * usually a value of 1
+   * Used to make select input fields
    */
-  usePriority?: number;
+  ElementWrapperSelectField?: React.ComponentType<IWrapperDrawerSelectFieldProps>;
+
+  // /**
+  //  * Used to make select input fields
+  //  */
+  // ElementWrapperMultiSelectField?: React.ComponentType<IWrapperDrawerMultiSelectFieldProps>;
 
   /**
-   * The input variant for elements
+   * Buttons used within the element wrappers
    */
-  inputVariant?: "filled" | "outlined" | "standard";
+  ElementWrapperButton?: React.ComponentType<IElementWrapperButton>;
+
+  /**
+   * The dropdown component to use
+   * note that it should support a ref object for this
+   */
+  DropdownComponent?: React.ComponentType<IDropdownComponentProps>;
+
+  /**
+   * Represents the optional parent box that some elements choose to use
+   */
+  DropdownComponentBox?: React.ComponentType<IDropdownComponentBoxProps>;
+
+  /**
+   * The component the dropdown is using as a wrapper
+   * for the element
+   */
+  DropdownComponentWrapper?: React.ComponentType<IDropdownComponentWrapperProps>;
+
+  /**
+   * Used mainly in the templated element that it wraps in order to say that
+   * there are more options
+   */
+  FieldWrapperForMoreOptions?: React.ComponentType<IFieldWrapperForMoreOptions>;
 }
 
 function getVideoURL(v: IVideo) {
@@ -102,13 +114,17 @@ function getVideoURL(v: IVideo) {
   }
 }
 
-function HTMLWrapper(props: IMaterialUIWrapperElementProps) {
+function HTMLWrapper(props: IDefaultSlateElementWrappersProps) {
   const [htmlOptions, setHTMLOptions] = useState<ITemplateOption[]>([]);
 
-  const updateHTML = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const label = htmlOptions.find((o) => o.value === e.target.value);
-    props.helpers.updateTemplateHTML(typeof label.label === "string" ? label.label : label.label(), e.target.value);
+  const updateHTMLB = useCallback((newV: string) => {
+    const label = htmlOptions.find((o) => o.value === newV);
+    props.helpers.updateTemplateHTML(typeof label.label === "string" ? label.label : label.label(), newV);
   }, [htmlOptions]);
+
+  const updateHTML = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateHTMLB(e.target.value);
+  }, [updateHTMLB]);
 
   useEffect(() => {
     if (!props.isSelected) {
@@ -177,58 +193,30 @@ function HTMLWrapper(props: IMaterialUIWrapperElementProps) {
     setHTMLOptions(htmlPropertiesToUse);
   }, [props.element, props.isSelected]);
 
-  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+  const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
 
   return (
     <EditorDropdown
-      componentWrapper="span"
+      DropdownComponent={props.DropdownComponent}
+      DropdownComponentBox={props.DropdownComponentBox}
+      DropdownComponentWrapper={props.DropdownComponentWrapper}
+      dropdownComponentWrapperTag="span"
       isOpen={props.isSelected}
       dropdown={
-        <AltBadgeReactioner
-          reactionKey="t"
-          priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-          selector="div[tabindex]"
-          action="focus"
-          fullWidth={true}
-          onTabOutTrigger="escape"
-        >
-          <FormControl fullWidth={true}>
-            <InputLabel
-              htmlFor="slate-wrapper-template-html-id"
-              shrink={true}
-            >
-              {props.i18nRichInfo.addTemplateHTML.label}
-            </InputLabel>
-            <Select
-              value={props.element.html}
-              onChange={updateHTML}
-              sx={styles.whiteBackgroundInput}
-              input={
-                <InputToUse
-                  id="slate-wrapper-template-html-id"
-                  placeholder={props.i18nRichInfo.addTemplateHTML.placeholder}
-                  label={props.i18nRichInfo.addTemplateHTML.placeholder}
-                  fullWidth={true}
-                />
-              }
-            >
-              {
-                // render the valid values that we display and choose
-                htmlOptions.map((vv) => {
-                  // the i18n value from the i18n data
-                  return <MenuItem
-                    data-unblur="true"
-                    key={vv.value}
-                    value={vv.value}
-                    sx={vv.primary ? styles.optionPrimary : null}
-                  >{
-                      typeof vv.label == "string" ? vv.label : vv.label()
-                    }</MenuItem>;
-                })
-              }
-            </Select>
-          </FormControl>
-        </AltBadgeReactioner>
+        <SelectField
+          id="template-html"
+          label={(props.baseI18n as IWrapperI18nRichTextInfo).addTemplateHTML.label}
+          onChangeByEvent={updateHTML}
+          onChangeByValue={updateHTMLB}
+          options={htmlOptions.map((v) => ({
+            label: typeof v.label === "function" ? v.label() : v.label,
+            value: v.value,
+            primary: v.primary,
+          }))}
+          resetBlur={null}
+          unblur={null}
+          value={props.element.html}
+        />
       }
     >
       {props.children}
@@ -236,13 +224,17 @@ function HTMLWrapper(props: IMaterialUIWrapperElementProps) {
   );
 }
 
-function TextWrapper(props: IMaterialUIWrapperElementProps) {
+function TextWrapper(props: IDefaultSlateElementWrappersProps) {
   const [textOptions, setTextOptions] = useState<ITemplateOption[]>([]);
 
-  const updateTextContent = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const label = textOptions.find((o) => o.value === e.target.value);
-    props.helpers.updateTemplateText(typeof label.label === "string" ? label.label : label.label(), e.target.value);
+  const updateTextContentB = useCallback((newV: string) => {
+    const label = textOptions.find((o) => o.value === newV);
+    props.helpers.updateTemplateText(typeof label.label === "string" ? label.label : label.label(), newV);
   }, [textOptions]);
+
+  const updateTextContent = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateTextContentB(e.target.value);
+  }, [updateTextContentB]);
 
   useEffect(() => {
     if (!props.isSelected) {
@@ -311,58 +303,30 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
     setTextOptions(textPropertiesToUse);
   }, [props.element, props.isSelected]);
 
-  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+  const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
 
   return (
     <EditorDropdown
-      componentWrapper="span"
+      DropdownComponent={props.DropdownComponent}
+      DropdownComponentBox={props.DropdownComponentBox}
+      DropdownComponentWrapper={props.DropdownComponentWrapper}
+      dropdownComponentWrapperTag="span"
       isOpen={props.isSelected}
       dropdown={
-        <AltBadgeReactioner
-          reactionKey="t"
-          priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-          selector="div[tabindex]"
-          action="focus"
-          fullWidth={true}
-          onTabOutTrigger="escape"
-        >
-          <FormControl fullWidth={true}>
-            <InputLabel
-              htmlFor="slate-wrapper-template-entry-id"
-              shrink={true}
-            >
-              {props.i18nRichInfo.addTemplateText.label}
-            </InputLabel>
-            <Select
-              value={props.element.textContent}
-              onChange={updateTextContent}
-              sx={styles.whiteBackgroundInput}
-              input={
-                <InputToUse
-                  id="slate-wrapper-template-entry-id"
-                  placeholder={props.i18nRichInfo.addTemplateText.placeholder}
-                  label={props.i18nRichInfo.addTemplateText.placeholder}
-                  fullWidth={true}
-                />
-              }
-            >
-              {
-                // render the valid values that we display and choose
-                textOptions.map((vv) => {
-                  // the i18n value from the i18n data
-                  return <MenuItem
-                    data-unblur="true"
-                    key={vv.value}
-                    value={vv.value}
-                    sx={vv.primary ? styles.optionPrimary : null}
-                  >{
-                      typeof vv.label == "string" ? vv.label : vv.label()
-                    }</MenuItem>;
-                })
-              }
-            </Select>
-          </FormControl>
-        </AltBadgeReactioner>
+        <SelectField
+          id="template-text"
+          label={(props.baseI18n as IWrapperI18nRichTextInfo).addTemplateText.label}
+          onChangeByEvent={updateTextContent}
+          onChangeByValue={updateTextContentB}
+          options={textOptions.map((v) => ({
+            label: typeof v.label === "function" ? v.label() : v.label,
+            value: v.value,
+            primary: v.primary,
+          }))}
+          resetBlur={null}
+          unblur={null}
+          value={props.element.html}
+        />
       }
     >
       {props.children}
@@ -370,7 +334,7 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
   );
 }
 
-function TdAndTh(props: IMaterialUIWrapperElementProps) {
+function TdAndTh(props: IDefaultSlateElementWrappersProps) {
   const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
   const parentPath = [...path];
   // tr
@@ -389,7 +353,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
     setTableType((tableElement as ITable).tableType || "");
   }, [(tableElement as ITable).tableType]);
 
-  const updateTableType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateTableTypeB = useCallback((newValue: string) => {
     const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
     const tablePath = [...path];
     // tr
@@ -400,16 +364,21 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
     tablePath.pop();
 
     props.helpers.set({
-      tableType: e.target.value || null,
+      tableType: newValue || null,
     } as any, tablePath);
-    setTableType(e.target.value || "");
+    setTableType(newValue || "");
   }, []);
+
+  const updateTableType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateTableTypeB(e.target.value)
+  }, [updateTableTypeB]);
 
   if (!props.featureSupport.availableContainers.length) {
     return props.children;
   }
 
-  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+  const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
+  const Button = props.ElementWrapperButton || DefaultElementWrapperButtonComponent;
 
   // because of dom nesting we will just put a fake component to the side
   // and a fake element so we don't nest a td in the table
@@ -417,162 +386,69 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
     <>
       {props.children}
       <EditorDropdown
-        componentWrapper="td"
-        componentWrapperHidden={true}
-        componentWrapperProps={{ contentEditable: false }}
+        DropdownComponent={props.DropdownComponent}
+        DropdownComponentBox={props.DropdownComponentBox}
+        DropdownComponentWrapper={props.DropdownComponentWrapper}
+        dropdownComponentWrapperTag="td"
+        dropdownComponentWrapperHidden={true}
+        dropdownComponentWrapperProps={{ contentEditable: false }}
         dropdownSizable={true}
         dropdown={
           <>
             {props.featureSupport.availableTables.length ? (
-              <AltBadgeReactioner
-                reactionKey="t"
-                priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-                selector="div[tabindex]"
-                action="focus"
-                onTabOutTrigger="escape"
-              >
-                <FormControl>
-                  <InputLabel
-                    htmlFor="slate-wrapper-table-entry-id"
-                    shrink={true}
-                  >
-                    {props.i18nRichInfo.type}
-                  </InputLabel>
-                  <Select
-                    value={tableType}
-                    onChange={updateTableType}
-                    displayEmpty={true}
-                    sx={[styles.whiteBackgroundInput, styles.fixedWidthInput]}
-                    input={
-                      <InputToUse
-                        id="slate-wrapper-table-entry-id"
-                        placeholder={props.i18nRichInfo.type}
-                        label={props.i18nRichInfo.type}
-                      />
-                    }
-                  >
-                    <MenuItem value="" data-unblur="true">
-                      <em>{" - "}</em>
-                    </MenuItem>
-                    {
-                      // render the valid values that we display and choose
-                      props.featureSupport.availableTables.map((vv) => {
-                        // the i18n value from the i18n data
-                        return <MenuItem
-                          data-unblur="true"
-                          key={vv.value}
-                          value={vv.value}
-                        >{
-                            vv.label
-                          }</MenuItem>;
-                      })
-                    }
-                  </Select>
-                </FormControl>
-              </AltBadgeReactioner>
+              <SelectField
+                value={tableType}
+                onChangeByEvent={updateTableType}
+                displayEmpty={true}
+                label={props.baseI18n.type}
+                id="table-type"
+                onChangeByValue={updateTableTypeB}
+                options={[{
+                  label: " - ",
+                  value: "",
+                }].concat(props.featureSupport.availableTables)}
+                resetBlur={null}
+                unblur={null}
+              />
             ) : null}
-            <AltBadgeReactioner
-              reactionKey="c"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTdLabel}
-                onClick={props.helpers.insertTableColumn}
-                size="large">
-                <>
-                  <ViewWeekIcon />
-                  <AddIcon sx={styles.iconAddRemove}/>
-                </>
-              </IconButton>
-            </AltBadgeReactioner>
-            <AltBadgeReactioner
-              reactionKey="r"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTrLabel}
-                onClick={props.helpers.insertTableRow}
-                size="large">
-                <>
-                  <TableRowsIcon />
-                  <AddIcon sx={styles.iconAddRemove}/>
-                </>
-              </IconButton>
-            </AltBadgeReactioner>
-            <AltBadgeReactioner
-              reactionKey="c"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatDelTdLabel}
-                onClick={props.helpers.deleteTableColumn}
-                size="large">
-                <>
-                  <ViewWeekIcon />
-                  <RemoveIcon sx={styles.iconAddRemove} />
-                </>
-              </IconButton>
-            </AltBadgeReactioner>
-            <AltBadgeReactioner
-              reactionKey="r"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTrLabel}
-                onClick={props.helpers.deleteTableRow}
-                size="large">
-                <>
-                  <TableRowsIcon />
-                  <RemoveIcon sx={styles.iconAddRemove}/>
-                </>
-              </IconButton>
-            </AltBadgeReactioner>
-            <AltBadgeReactioner
-              reactionKey="h"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddThLabel}
-                onClick={props.helpers.toggleTable.bind(null, "thead")}
-                disabled={!props.helpers.canToggleTable("thead")}
-                size="large"
-                color={props.element.type === "th" ? "primary" : "default"}
-              >
-                <CreditCardIcon />
-              </IconButton>
-            </AltBadgeReactioner>
-            <AltBadgeReactioner
-              reactionKey="f"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="button"
-              onTabOutTrigger="escape"
-            >
-              <IconButton
-                tabIndex={-1}
-                title={props.i18nRichInfo.formatAddTfootLabel}
-                onClick={props.helpers.toggleTable.bind(null, "tfoot")}
-                disabled={!props.helpers.canToggleTable("tfoot")}
-                size="large"
-                color={parentTheadOrTbodyOrTfoot.type === "tfoot" ? "primary" : "default"}
-              >
-                <CreditCardIcon sx={styles.upsideDown} />
-              </IconButton>
-            </AltBadgeReactioner>
+            <Button
+              id="table-add-td"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTdLabel}
+              onClick={props.helpers.insertTableColumn}
+              disabled={false}
+            />
+            <Button
+              id="table-add-tr"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTrLabel}
+              onClick={props.helpers.insertTableRow}
+              disabled={false}
+            />
+            <Button
+              id="table-del-td"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatDelTdLabel}
+              onClick={props.helpers.deleteTableColumn}
+              disabled={false}
+            />
+            <Button
+              id="table-del-tr"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatDelTrLabel}
+              onClick={props.helpers.deleteTableRow}
+              disabled={false}
+            />
+            <Button
+              id="table-toggle-th"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddThLabel}
+              onClick={props.helpers.toggleTable.bind(null, "thead")}
+              disabled={!props.helpers.canToggleTable("thead")}
+              selected={props.element.type === "th"}
+            />
+            <Button
+              id="table-toggle-tfoot"
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTfootLabel}
+              onClick={props.helpers.toggleTable.bind(null, "tfoot")}
+              disabled={!props.helpers.canToggleTable("tfoot")}
+              selected={parentTheadOrTbodyOrTfoot.type === "tfoot"}
+            />
           </>
         }
         isOpen={props.isSelected}
@@ -586,20 +462,28 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
 
 export const materialUIElementWrappers: ISlateEditorElementWrappers = {
   components: {
-    link: (props: IMaterialUIWrapperElementProps) => {
+    link: (props: IDefaultSlateElementWrappersProps) => {
       const [valid, setValid] = useState(true);
       const [linkOptions, setLinkOptions] = useState<ITemplateOption[]>([]);
       const [elementHref, setElementHref] = useState((props.element as ILink).href || "");
 
-      const updateElementHref = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const valid = props.helpers.updateLink(e.target.value, (props.element as ILink).thref || null);
-        setElementHref(e.target.value);
+      const updateElementHrefB = useCallback((newV: string) => {
+        const valid = props.helpers.updateLink(newV, (props.element as ILink).thref || null);
+        setElementHref(newV);
         setValid(valid);
-      }, []);
+      }, [props.element]);
 
-      const updateElementTHref = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const valid = props.helpers.updateLink((props.element as ILink).href || null, e.target.value);
+      const updateElementTHrefB = useCallback((newV: string) => {
+        const valid = props.helpers.updateLink((props.element as ILink).href || null, newV);
         setValid(valid);
+      }, [props.element]);
+
+      const updateElementHref = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        updateElementHrefB(e.target.value);
+      }, [updateElementHrefB]);
+
+      const updateElementTHref = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        updateElementTHrefB(e.target.value);
       }, []);
 
       useEffect(() => {
@@ -669,94 +553,53 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         setLinkOptions(linkPropertiesToUse);
       }, [props.element, props.isSelected]);
 
-      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+      const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
+      const TextField = props.ElementWrapperTextField || DefaultWrapperDrawerTextField;
+      const FieldWrapperForMoreOptions = props.FieldWrapperForMoreOptions || DefaultFieldWrapperForMoreOptions;
 
       return (
         <EditorDropdown
-          componentWrapper="span"
+          dropdownComponentWrapperTag="span"
           isOpen={props.isSelected}
           dropdown={
             <>
-              <AltBadgeReactioner
-                reactionKey="h"
-                priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-                selector="input"
-                action="focus"
+              <TextField
+                value={elementHref}
+                onChangeByEvent={updateElementHref}
+                onChangeByValue={updateElementHrefB}
+                label={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.label}
                 disabled={!!(props.element as ILink).thref}
-                fullWidth={true}
-                onTabOutTrigger="escape"
-              >
-                <TextField
-                  value={elementHref}
-                  onChange={updateElementHref}
-                  label={props.i18nRichInfo.setLink.label}
-                  disabled={!!(props.element as ILink).thref}
-                  placeholder={
-                    props.featureSupport.supportsExternalLinks ?
-                      props.i18nRichInfo.setLink.placeholder :
-                      props.i18nRichInfo.setLink.placeholderLocalOnly
-                  }
-                  fullWidth={true}
-                  tabIndex={-1}
-                  sx={!(props.element as ILink).thref ? styles.whiteBackgroundInput : null}
-                  variant={props.inputVariant}
-                />
-              </AltBadgeReactioner>
+                placeholder={
+                  props.featureSupport.supportsExternalLinks ?
+                    (props.baseI18n as IWrapperI18nRichTextInfo).setLink.placeholder :
+                    (props.baseI18n as IWrapperI18nRichTextInfo).setLink.placeholderLocalOnly
+                }
+                id="link-href"
+              />
               {
                 linkOptions.length ?
-                  <Box sx={styles.linkTemplateOptionsBox}>
-                    <Box sx={styles.linkTemplateOptionsText}>{props.i18nRichInfo.setLink.templated}</Box>
-                    <AltBadgeReactioner
-                      reactionKey="t"
-                      priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-                      selector="div[tabindex]"
-                      action="focus"
-                      fullWidth={true}
-                      onTabOutTrigger="escape"
-                    >
-                      <FormControl fullWidth={true}>
-                        <InputLabel
-                          htmlFor="slate-wrapper-template-entry-id"
-                          shrink={true}
-                        >
-                          {props.i18nRichInfo.setLink.templatedLabel}
-                        </InputLabel>
-                        <Select
-                          value={(props.element as ILink).thref || ""}
-                          onChange={updateElementTHref}
-                          displayEmpty={true}
-                          fullWidth={true}
-                          sx={styles.whiteBackgroundInput}
-                          input={
-                            <InputToUse
-                              id="slate-wrapper-template-entry-id"
-                              placeholder={props.i18nRichInfo.setLink.templatedPlaceholder}
-                              label={props.i18nRichInfo.setLink.templatedPlaceholder}
-                              fullWidth={true}
-                            />
-                          }
-                        >
-                          <MenuItem value="" data-unblur="true">
-                            <em>{props.i18nRichInfo.setLink.templatedUnspecified}</em>
-                          </MenuItem>
-                          {
-                            // render the valid values that we display and choose
-                            linkOptions.map((vv) => {
-                              // the i18n value from the i18n data
-                              return <MenuItem
-                                data-unblur="true"
-                                key={vv.value}
-                                value={vv.value}
-                                sx={vv.primary ? styles.optionPrimary : null}
-                              >{
-                                  typeof vv.label == "string" ? vv.label : vv.label()
-                                }</MenuItem>;
-                            })
-                          }
-                        </Select>
-                      </FormControl>
-                    </AltBadgeReactioner>
-                  </Box> :
+                  <FieldWrapperForMoreOptions label={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.templated}>
+                    <SelectField
+                      id="link-thref"
+                      value={(props.element as ILink).thref || ""}
+                      label={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.templatedLabel}
+                      placeholder={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.templatedPlaceholder}
+                      onChangeByEvent={updateElementTHref}
+                      onChangeByValue={updateElementTHrefB}
+                      displayEmpty={true}
+                      options={[{
+                        label: (props.baseI18n as IWrapperI18nRichTextInfo).setLink.templatedUnspecified,
+                        value: "",
+                      }].concat(linkOptions.map((v) => ({
+                        label: typeof v.label === "function" ? v.label() : v.label,
+                        value: v.value,
+                        primary: v.primary,
+                      })))}
+                      resetBlur={null}
+                      unblur={null}
+                    />
+                  </FieldWrapperForMoreOptions>
+                  :
                   null
               }
             </>
@@ -766,43 +609,41 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         </EditorDropdown>
       );
     },
-    video: (props: IMaterialUIWrapperElementProps) => {
+    video: (props: IDefaultSlateElementWrappersProps) => {
       const [value, setValue] = useState(getVideoURL(props.element as IVideo));
       const [valid, setValid] = useState(true);
 
-      const updateVideoURL = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-        setValid(props.helpers.updateVideo(e.target.value));
+      const updateVideoURLB = useCallback((newV: string) => {
+        setValue(newV);
+        setValid(props.helpers.updateVideo(newV));
       }, []);
+
+      const updateVideoURL = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        updateVideoURLB(e.target.value);
+      }, [updateVideoURLB]);
 
       useEffect(() => {
         setValue(getVideoURL(props.element as IVideo));
       }, [props.element]);
 
+      const TextField = props.ElementWrapperTextField || DefaultWrapperDrawerTextField;
+
       return (
         <EditorDropdown
+          DropdownComponent={props.DropdownComponent}
+          DropdownComponentBox={props.DropdownComponentBox}
+          DropdownComponentWrapper={props.DropdownComponentWrapper}
           dropdown={
-            <AltBadgeReactioner
-              reactionKey="u"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="input"
-              action="focus"
-              fullWidth={true}
-              onTabOutTrigger="escape"
-            >
-              <TextField
-                value={value}
-                onChange={updateVideoURL}
-                label={props.i18nRichInfo.loadVideo.label}
-                placeholder={props.i18nRichInfo.loadVideo.placeholder}
-                fullWidth={true}
-                sx={styles.whiteBackgroundInput}
-                variant={props.inputVariant}
-                tabIndex={-1}
-              />
-            </AltBadgeReactioner>
+            <TextField
+              value={value}
+              onChangeByEvent={updateVideoURL}
+              onChangeByValue={updateVideoURLB}
+              label={(props.baseI18n as IWrapperI18nRichTextInfo).loadVideo.label}
+              placeholder={(props.baseI18n as IWrapperI18nRichTextInfo).loadVideo.placeholder}
+              id="video-url"
+            />
           }
-          componentWrapper="div"
+          dropdownComponentWrapperTag="div"
           goIntoTreeDepth={1}
           isOpen={props.isSelected}
         >
@@ -810,45 +651,42 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         </EditorDropdown>
       );
     },
-    image: (props: IMaterialUIWrapperElementProps) => {
+    image: (props: IDefaultSlateElementWrappersProps) => {
       const [alt, setAlt] = useState((props.element as IImage).alt || "");
 
       useEffect(() => {
         setAlt((props.element as IImage).alt || "");
       }, [props.element]);
 
-      const updateAlt = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      const updateAltB = useCallback((newValue: string) => {
         const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
         props.helpers.set({
-          alt: e.target.value || null,
+          alt: newValue || null,
         } as any, path);
-        setAlt(e.target.value);
+        setAlt(newValue);
       }, []);
+
+      const updateAlt = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        updateAltB(e.target.value);
+      }, [updateAltB]);
+
+      const TextField = props.ElementWrapperTextField || DefaultWrapperDrawerTextField;
 
       return (
         <EditorDropdown
+          DropdownComponent={props.DropdownComponent}
+          DropdownComponentBox={props.DropdownComponentBox}
+          DropdownComponentWrapper={props.DropdownComponentWrapper}
           dropdown={
-            <AltBadgeReactioner
-              reactionKey="a"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="input"
-              action="focus"
-              fullWidth={true}
-              onTabOutTrigger="escape"
-            >
-              <TextField
-                value={alt}
-                onChange={updateAlt}
-                label={props.i18nRichInfo.alt}
-                placeholder={props.i18nRichInfo.alt}
-                fullWidth={true}
-                sx={styles.whiteBackgroundInput}
-                variant={props.inputVariant}
-                tabIndex={-1}
-              />
-            </AltBadgeReactioner>
+            <TextField
+              value={alt}
+              onChangeByEvent={updateAlt}
+              onChangeByValue={updateAltB}
+              label={props.baseI18n.alt}
+              id="image-alt"
+            />
           }
-          componentWrapper="div"
+          dropdownComponentWrapperTag="div"
           goIntoTreeDepth={(props.element as IImage).standalone ? null : 1}
           isOpen={props.isSelected}
         >
@@ -858,154 +696,104 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
     },
     td: TdAndTh as any,
     th: TdAndTh as any,
-    title: (props: IMaterialUIWrapperElementProps) => {
-      const updateTitleType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    title: (props: IDefaultSlateElementWrappersProps) => {
+      const updateTitleTypeB = useCallback((newV: string) => {
         const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
         props.helpers.set({
-          titleType: e.target.value || null,
+          titleType: newV || null,
         } as any, path);
       }, []);
 
-      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+      const updateTitleType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        updateTitleTypeB(e.target.value);
+      }, [updateTitleTypeB]);
+
+      const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
 
       return (
         <EditorDropdown
-          componentWrapper="div"
+          DropdownComponent={props.DropdownComponent}
+          DropdownComponentBox={props.DropdownComponentBox}
+          DropdownComponentWrapper={props.DropdownComponentWrapper}
+          dropdownComponentWrapperTag="div"
           isOpen={props.isSelected}
           dropdown={
-            <AltBadgeReactioner
-              reactionKey="t"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="div[tabindex]"
-              action="focus"
-              fullWidth={true}
-              onTabOutTrigger="escape"
-            >
-              <FormControl fullWidth={true}>
-                <InputLabel
-                  htmlFor="slate-wrapper-title-entry-id"
-                  shrink={true}
-                >
-                  {props.i18nRichInfo.type}
-                </InputLabel>
-                <Select
-                  value={(props.element as ITitle).titleType || ""}
-                  onChange={updateTitleType}
-                  displayEmpty={true}
-                  sx={styles.whiteBackgroundInput}
-                  input={
-                    <InputToUse
-                      id="slate-wrapper-title-entry-id"
-                      placeholder={props.i18nRichInfo.type}
-                      label={props.i18nRichInfo.type}
-                      fullWidth={true}
-                    />
-                  }
-                >
-                  {
-                    // render the valid values that we display and choose
-                    ["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
-                      return <MenuItem
-                        data-unblur="true"
-                        key={Element}
-                        value={Element}
-                      >
-                        <Element>
-                          {props.i18nRichInfo.title}
-                        </Element>
-                      </MenuItem>;
-                    })
-                  }
-                </Select>
-              </FormControl>
-            </AltBadgeReactioner>
+            <SelectField
+              id="title-type"
+              label={props.baseI18n.type}
+              onChangeByEvent={updateTitleType}
+              onChangeByValue={updateTitleTypeB}
+              options={["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
+                return {
+                  label: <Element>{props.baseI18n.title}</Element>,
+                  value: Element,
+                }
+              })}
+              resetBlur={null}
+              unblur={null}
+              value={(props.element as IContainer).containerType || ""}
+              displayEmpty={true}
+            />
           }
         >
           {props.children}
         </EditorDropdown>
       ) as any;
     },
-    inline: (props: IMaterialUIWrapperElementProps) => {
+    inline: (props: IDefaultSlateElementWrappersProps) => {
       if (typeof props.element.textContent !== "string") {
         return props.children;
       }
 
       return (<TextWrapper {...props} />) as any;
     },
-    "void-block": (props: IMaterialUIWrapperElementProps) => {
+    "void-block": (props: IDefaultSlateElementWrappersProps) => {
       if (typeof props.element.html === "undefined") {
         return props.children;
       }
 
       return (<HTMLWrapper {...props} />) as any;
     },
-    container: (props: IMaterialUIWrapperElementProps) => {
-      const updateContainerType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    container: (props: IDefaultSlateElementWrappersProps) => {
+      const updateContainerTypeB = useCallback((newV: string) => {
         const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
         props.helpers.set({
-          containerType: e.target.value || null,
+          containerType: newV || null,
         } as any, path);
       }, []);
+
+      const updateContainerType = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        updateContainerTypeB(e.target.value);
+      }, [updateContainerTypeB]);
 
       if (!props.featureSupport.availableContainers.length) {
         return props.children;
       }
 
-      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+      const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
 
       return (
         <EditorDropdown
-          componentWrapper="span"
+          DropdownComponent={props.DropdownComponent}
+          DropdownComponentBox={props.DropdownComponentBox}
+          DropdownComponentWrapper={props.DropdownComponentWrapper}
+          dropdownComponentWrapperTag="span"
           isOpen={props.isSelected}
           dropdown={
-            <AltBadgeReactioner
-              reactionKey="t"
-              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
-              selector="div[tabindex]"
-              action="focus"
-              fullWidth={true}
-              onTabOutTrigger="escape"
-            >
-              <FormControl fullWidth={true}>
-                <InputLabel
-                  htmlFor="slate-wrapper-container-entry-id"
-                  shrink={true}
-                >
-                  {props.i18nRichInfo.type}
-                </InputLabel>
-                <Select
-                  value={(props.element as IContainer).containerType || ""}
-                  onChange={updateContainerType}
-                  displayEmpty={true}
-                  sx={styles.whiteBackgroundInput}
-                  input={
-                    <InputToUse
-                      id="slate-wrapper-container-entry-id"
-                      placeholder={props.i18nRichInfo.type}
-                      label={props.i18nRichInfo.type}
-                      fullWidth={true}
-                    />
-                  }
-                >
-                  <MenuItem value="" data-unblur="true">
-                    <em>{" - "}</em>
-                  </MenuItem>
-                  {
-                    // render the valid values that we display and choose
-                    props.featureSupport.availableContainers.map((vv) => {
-                      // the i18n value from the i18n data
-                      return <MenuItem
-                        data-unblur="true"
-                        key={vv.value}
-                        value={vv.value}
-                      >{
-                          vv.label
-                        }</MenuItem>;
-                    })
-                  }
-                </Select>
-              </FormControl>
-            </AltBadgeReactioner>
+            <SelectField
+              id="container-type"
+              label={props.baseI18n.type}
+              onChangeByEvent={updateContainerType}
+              onChangeByValue={updateContainerTypeB}
+              options={[{
+                label: " - ",
+                value: "",
+              }].concat(props.featureSupport.availableContainers)}
+              resetBlur={null}
+              unblur={null}
+              value={(props.element as IContainer).containerType || ""}
+              displayEmpty={true}
+            />
           }
         >
           {props.children}

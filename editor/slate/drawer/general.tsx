@@ -19,6 +19,8 @@ export function DefaultWrapperDrawerInternalPanelWrapper(props: { children: Reac
 export interface IWrapperDrawerTextFieldProps {
   value: string;
   label: string;
+  placeholder?: string;
+  disabled?: boolean;
   onChangeByEvent: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onChangeByValue: (v: string) => void;
   id: string;
@@ -27,20 +29,24 @@ export interface IWrapperDrawerTextFieldProps {
 export interface IWrapperDrawerSelectFieldProps {
   value: string;
   label: string;
+  placeholder?: string;
+  disabled?: boolean;
   onChangeByEvent: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onChangeByValue: (v: string) => void;
   id: string;
-  options: Array<{ value: string; label: string; primary?: boolean }>;
+  options: Array<{ value: string ; label: string | React.ReactNode; primary?: boolean }>;
   unblur: () => void;
   resetBlur: () => void;
+  displayEmpty?: boolean;
 }
 
 export interface IWrapperDrawerMultiSelectFieldProps {
   values: string[];
   label: string;
+  disabled?: boolean;
   onChange: (v: string[]) => void;
   id: string;
-  options: Array<{ value: string; label: string; primary?: boolean  }>;
+  options: Array<{ value: string; label: string | React.ReactNode; primary?: boolean  }>;
   unblur: () => void;
   resetBlur: () => void;
 }
@@ -50,6 +56,7 @@ export interface IWrapperDrawerCheckBoxProps {
   label: string;
   onChange: (v: boolean) => void;
   id: string;
+  disabled?: boolean;
 }
 
 export function DefaultWrapperDrawerTextField(props: IWrapperDrawerTextFieldProps) {
@@ -58,8 +65,9 @@ export function DefaultWrapperDrawerTextField(props: IWrapperDrawerTextFieldProp
       <label>{props.label}</label>
       <input
         value={props.value}
-        placeholder={props.label}
+        placeholder={props.placeholder || props.label}
         onChange={props.onChangeByEvent}
+        disabled={props.disabled}
       />
     </div>
   )
@@ -72,6 +80,8 @@ export function DefaultWrapperDrawerSelectField(props: IWrapperDrawerSelectField
       <select
         value={props.value}
         onChange={props.onChangeByEvent}
+        disabled={props.disabled}
+        placeholder={props.placeholder}
       >
         {props.options.map(option => (
           <option key={option.value} value={option.value}>
@@ -95,6 +105,7 @@ export function DefaultWrapperDrawerMultiSelectField(props: IWrapperDrawerMultiS
         multiple={true}
         value={props.values}
         onChange={handleSelectChange}
+        disabled={props.disabled}
       >
         {props.options.map(option => (
           <option key={option.value} value={option.value}>
@@ -118,6 +129,7 @@ export function DefaultWrapperDrawerCheckBoxField(props: IWrapperDrawerCheckBoxP
         type="checkbox"
         checked={props.value}
         onChange={handleChange}
+        disabled={props.disabled}
       />
       <label>{props.label}</label>
     </div>
