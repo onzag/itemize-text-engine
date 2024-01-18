@@ -373,10 +373,6 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
     updateTableTypeB(e.target.value)
   }, [updateTableTypeB]);
 
-  if (!props.featureSupport.availableContainers.length) {
-    return props.children;
-  }
-
   const SelectField = props.ElementWrapperSelectField || DefaultWrapperDrawerSelectField;
   const Button = props.ElementWrapperButton || DefaultElementWrapperButtonComponent;
 
