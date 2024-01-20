@@ -12,82 +12,58 @@ When using text engine, it's possible to control how elements are displayed; sin
 
 Text engine enforces the concept of separation of images/files as separate from the textual content itself.
 
-## Standalone Usage
+## Differences between an editor
 
 Originally text engine was meant to be used within itemize as a way to process text, but it can prove useful outside of it; it was originally developed to create posts and determine the UI elements of a cycling buy/sell website.
 
-As such it was tied to Itemize, which name referred to "itemizing" these buy/sell products, however, the website didn't go anywhere but all the elements of text engine, accessibility and organization stayed behind; Itemize grew to be a behemot on its own, and the text engine was ripped appart from the original source so it could be used within other projects that didn't use Itemize but used plain react.
+Itemize text engine is not an editor, it's more of a spec for handling text in the client side for an editor to be integrated; the text engine here has one editor integrated (Slate), but in theory other editors should be integrable and fully functional with it given they adhere to the spec and function in tandem by writing a wrapper; however text-engine was written to work nicely with slate; even when it was originally designed to work with QuillJS, slate ended up proving to handle all the needs better.
 
-As a result standalone usage comes with providing information in the format that is expected to be consumed, in the spec that is expected to be consumed; therefore you should ensure that the input html comes in the proper format, if text engine itself created such html then it isn't relevant; but if it was generated somewhere else, by some other editor you may need to do a pre-processing step, which isn't covered here.
+While an editor like Plate shows more advanced features that what is availble by default, text engine could in theory work with plate as an editor; or even CkEditor5; however the bridge has to be written, and currently only plain slate is available.
 
-### Sanitizing input (and displaying as it is)
+Note that text engine default editor comes unstyled, so it's quite ugly, but it can be made to look pretty since you (the developer) constrols all aspects of its display, it does in fact take quite a bit of setup to make the default editor look okay and that's covered in the examples.
 
-If the input from the database/client side endpoint 
+The text engine follows several processes:
 
-#### Styling
+### Sanitizing
 
+The content of the document is sanitized based on the text specification criteria, making it say to display as it is.
 
-### Sanitizing input (and displaying as basic template)
+### Images and Files
 
-Sometimes you want the content to differ and not be exactly the same html that was inputted, for example; let's say you have the following html
+Images and files are handled as binary, and not as base64 and urls are not stored in the text information because text information should be stored and indexed at a database level, and files may be distributed in a different manner (for example using content delivery networks under different urls), so since urls may be changing they are not part of the text information.
 
-```html
-<div class="container" style="border: solid 1px red;" data-style-hover="border: solid 2px blue;">
-    <p>hello <span data-text="userName">USERNAME</span> click <span data-html="button">BUTTON</span> to log in</p>
-</div>
+### Embedded Video
+
+Embbeded video from vimeo or youtube is part of the spec.
+
+### Server Side rendering
+
+The processing of the text and file information is done in a way that server side rendering of it is supported.
+
+### Templating
+
+The core of text engine is templating, when content is following the spec it can be processed with one of the renderers to decide how the content is to be visualized; this allows for dynamic content to be generated, for example, you may edit the UI itself with the editor, build customized email templates, or create interactive content, such as polls or educational material.
+
+Templating supports actions, conditions, loops, and contexting; all while using simple HTML so the server side can build indexes for templates using ordinary XML parsers.
+
+### Custom Widgets
+
+Widgets (named UI handlers) can be created to build customized UI components that can act in a different way in editing mode and view mode, this can be done for example to build math.
+
+## Examples and Usage
+
+Check the examples folder for usage, the options provided by text engine are vast and most of the functionality can be seen by visiting the code; the properties are well documented within the code on what they do.
+
+API documentation in md format will come later, the examples are a good place to start.
+
+## Installation
+
+Because text engine is bundled in the same way itemize is, it builds itself when it's instaled, so it needs its peer dependencies to work.
+
+The reason on why it is done so you must import the ts files and build them with your builder is because that simplifies debugging and patching on live systems (since this is part of the itemize flow, the parent library). This means that the installation process is non-standard and the bundling process is also non standard; since what the library contains is typescript source.
+
+As the time of the writing it requires react 17, until itemize itself is ported to react 18 this will not change
+
 ```
-
-which you want the username part to be the username, and the button part to be a button you may be willing to insert in place, this is using the `data-text`, `data-html`, `data-style-hover` templating attributes, other attributes are `data-style-active`, `data-for-each`, `data-if`, and `data-on-click` (among other events).
-
-Some of these attributes require what is determined to be context info, in this case a proper context could be
-
-There is two ways to render this template, statically, or dynamically.
-
-A static render is useful when you want to, for example, replace USERNAME and BUTTON, with plain text values, but it will not affect dynamic elements, as a result, it will of course not add anything and it will return a string; this can be used for example, to send an email.
-
-In this case the arguments could be
-
-```typescript
-const args = {
-    userName: "John Doe",
-    button: "<a href="https://mysite.com/validate?token=xxx"><button>here</button></a>"
-}
+npm install --save @onzag/itemize-text-engine react@^17.0.2 react-dom@^17.0.2 @types/react@^17.0.2 @types/react-dom@^17.0.2
 ```
-
-The function recalled is `renderTemplate` and returns a string, unless `renderTemplateAsNode` is used, which returns a HTML element, `renderTemplateAsNode` doe not sanitize so it isn't recommended unless a very specific case.
-
-```typescript
-const result = renderTemplate(
-    originalValue,
-    
-)
-```
-
-However a dynamic render which is more often used in 
-
-### Sanitizing input (and displaying as customized template)
-
-You may use this, for example, to wrap images
-
-### Configuring the editor
-
-The editor given for itemize text engine is the slate editor
-
-#### Writing text
-
-#### Writing templates
-
-
-### Extending the editor (UI Handlers)
-
-
-### Customizing the editor
-
-#### Toolbar
-
-#### Drawer
-
-#### Element Wrappers
-
-
-### Custom Editor
