@@ -180,7 +180,7 @@ function Example() {
 
   return (
     <div>
-      <h1>Basic Editing</h1>
+      <h1>Template Editing</h1>
 
       <section>
         <h4>
