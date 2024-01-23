@@ -364,6 +364,10 @@ export type SlateEditorWrapperCustomToolbarElement =
   SlateEditorWrapperCustomToolbarElementBaseForm |
   SlateEditorWrapperCustomToolbarElementFnForm;
 
+export interface IWrapperDrawerInternalPanelWrapperProps { children: React.ReactNode, args: any; };
+
+export interface IWrapperDrawerElementTitleWrapperProps { children: React.ReactNode, args: any; };
+
 /**
  * These are the base props that this wrapper uses, note how we extend the base wrapper props as defined
  * in the slate editor itself, and add the styles for the classes and these i18n info
@@ -513,7 +517,7 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   /**
    * Used for wrapping all the titles generated
    */
-  WrapperDrawerElementTitleWrapper?: React.ComponentType<{ children: React.ReactNode }>;
+  WrapperDrawerElementTitleWrapper?: React.ComponentType<IWrapperDrawerElementTitleWrapperProps>;
 
   /**
    * Wraps the information panel from the drawer, whatever is visible
@@ -528,7 +532,7 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   /**
    * Used to wrap the internal panel
    */
-  WrapperDrawerInternalPanelWrapper?: React.ComponentType<{ children: React.ReactNode }>;
+  WrapperDrawerInternalPanelWrapper?: React.ComponentType<IWrapperDrawerInternalPanelWrapperProps>;
 
   /**
    * Used to make text input fields
@@ -551,6 +555,11 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   WrapperDrawerMultiSelectField?: React.ComponentType<IWrapperDrawerMultiSelectFieldProps>;
 
   /**
+   * custom args that are passed to every element down the stream that is custom
+   */
+  customArgs?: any;
+
+  /**
    * add extra children to the drawer
    */
   drawerExtraChildren?: React.ReactNode;
@@ -566,6 +575,10 @@ function DefaultEditorContainer(props: IEditorContainerProps) {
 
 export interface IDrawerTemplatingContainerBoxProps {
   children: React.ReactNode;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 /**
@@ -579,15 +592,27 @@ export interface ISingleTemplatingElementOption {
 
 export interface IEditorWrapperProps extends IDefaultSlateWrapperProps {
   drawerOpen: boolean;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IEditorContainerProps {
   children: React.ReactNode;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IEditorProps {
   children: React.ReactNode;
   className: string;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 
@@ -2052,8 +2077,8 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
     let box: React.ReactNode = null;
     if (this.props.disjointedMode) {
       box = (
-        <DisjointedEditorContainer ref={this.editorRef as any} className="slateEditorDisjointedEditorContainer">
-          <DisjointedEditor className={basicClassName}>
+        <DisjointedEditorContainer ref={this.editorRef as any} className="slateEditorDisjointedEditorContainer" args={this.props.customArgs}>
+          <DisjointedEditor className={basicClassName} args={this.props.customArgs}>
             {this.props.children}
           </DisjointedEditor>
           <div data-not-editor={true} style={{ width: "100%" }}>
@@ -2067,6 +2092,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
           <Editor
             ref={this.editorRef as any}
             className={basicClassName}
+            args={this.props.customArgs}
           >
             {this.props.children}
           </Editor>
@@ -2082,6 +2108,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
         <BaseWrapper
           {...this.props}
           drawerOpen={this.state.drawerOpen}
+          args={this.props.customArgs}
         >
           {box}
         </BaseWrapper>
@@ -2092,7 +2119,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
       const ToolbarWrapper = this.props.ToolbarWrapper;
 
       toolbar = (
-        <ToolbarWrapper {...this.props} drawerOpen={this.state.drawerOpen}>
+        <ToolbarWrapper {...this.props} drawerOpen={this.state.drawerOpen} args={this.props.customArgs}>
           {toolbar}
         </ToolbarWrapper>
       );
@@ -2102,7 +2129,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
       const DrawerWrapper = this.props.DrawerWrapper;
 
       drawerContainer = (
-        <DrawerWrapper {...this.props} drawerOpen={this.state.drawerOpen}>
+        <DrawerWrapper {...this.props} drawerOpen={this.state.drawerOpen} args={this.props.customArgs}>
           {drawerContainer}
         </DrawerWrapper>
       );
@@ -2125,7 +2152,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
       toReturn = (
         <>
           {toolbar}
-          <EditorContainer>
+          <EditorContainer args={this.props.customArgs}>
             {box}
             {drawerContainer}
           </EditorContainer>
@@ -2140,7 +2167,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
       const FinalWrapper = this.props.FinalWrapper;
 
       toReturn = (
-        <FinalWrapper {...this.props} drawerOpen={this.state.drawerOpen}>
+        <FinalWrapper {...this.props} drawerOpen={this.state.drawerOpen} args={this.props.customArgs}>
           {toReturn}
         </FinalWrapper>
       );
@@ -2185,6 +2212,10 @@ export interface IDrawerContainerBoxProps {
    * according to a toolbar action
    */
   drawerOpen: boolean;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 /**
@@ -2202,6 +2233,10 @@ export interface IDrawerSpacerProps {
    * is currently being on use
    */
   toolbarHeight: number;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IDrawerBodyProps {
@@ -2222,6 +2257,10 @@ export interface IDrawerBodyProps {
    * Whether the drawer is open or not
    */
   drawerOpen: boolean;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export type DrawerContainerBoxComponent = React.ComponentType<IDrawerContainerBoxProps>;
@@ -2293,12 +2332,14 @@ class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerCont
         drawerOpen={this.props.drawerOpen}
         noAnimate={this.props.noAnimate}
         toolbarHeight={this.props.toolbarHeight}
+        args={this.props.customArgs}
       >
         {
           this.props.disjointedMode && this.props.drawerOpen ?
             <DrawerSpacer
               disjointedMode={this.props.disjointedMode}
               toolbarHeight={this.props.toolbarHeight}
+              args={this.props.customArgs}
             /> :
             null
         }
@@ -2307,6 +2348,7 @@ class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerCont
           disjointedMode={this.props.disjointedMode}
           toolbarHeight={this.props.toolbarHeight}
           drawerOpen={this.props.drawerOpen}
+          args={this.props.customArgs}
         >
           <WrapperDrawer {...this.props} />
         </DrawerBody>

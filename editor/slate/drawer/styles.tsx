@@ -47,6 +47,10 @@ interface ISingleStyleProps {
    * The id of the field
    */
   id: string;
+  /**
+   * custom args
+   */
+  customArgs: any;
 }
 
 /**
@@ -145,6 +149,7 @@ class SingleStyle extends React.PureComponent<ISingleStyleProps, ISingleStyleSta
         onChangeByEvent={this.onStyleChange}
         label={this.props.name}
         id={this.props.id}
+        args={this.props.customArgs}
       />
     );
   }
@@ -275,6 +280,7 @@ class ClassesOptionSelector extends React.PureComponent<IDrawerContainerProps, I
         resetBlur={this.resetBlur}
         unblur={this.unblur}
         values={this.state.value}
+        args={this.props.customArgs}
       />
     );
   }
@@ -312,7 +318,7 @@ export function StylesOptions(props: IDrawerContainerProps) {
   const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
 
   return (
-    <WrapperDrawerInternalPanelWrapper>
+    <WrapperDrawerInternalPanelWrapper args={this.props.customArgs}>
       {imgStandalone}
       {
         props.featureSupport.supportsRichClasses ?
@@ -329,6 +335,7 @@ export function StylesOptions(props: IDrawerContainerProps) {
             styleValue={currentNode.style}
             TextField={props.WrapperDrawerTextField}
             id="style"
+            customArgs={props.customArgs}
           /> : null
       }
       {
@@ -340,6 +347,7 @@ export function StylesOptions(props: IDrawerContainerProps) {
             styleValue={currentNode.styleHover}
             TextField={props.WrapperDrawerTextField}
             id="style-hover"
+            customArgs={props.customArgs}
           /> : null
       }
       {
@@ -351,6 +359,7 @@ export function StylesOptions(props: IDrawerContainerProps) {
             styleValue={currentNode.styleActive}
             TextField={props.WrapperDrawerTextField}
             id="style-active"
+            customArgs={props.customArgs}
           /> : null
       }
     </WrapperDrawerInternalPanelWrapper>

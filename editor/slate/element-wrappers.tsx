@@ -26,6 +26,7 @@ export interface IElementWrapperButton {
   disabled: boolean;
   selected?: boolean;
   onClick: () => void;
+  args: any;
 }
 
 function DefaultElementWrapperButtonComponent(props: IElementWrapperButton) {
@@ -43,6 +44,7 @@ function DefaultElementWrapperButtonComponent(props: IElementWrapperButton) {
 export interface IFieldWrapperForMoreOptions {
   label: string;
   children: React.ReactNode;
+  args: any;
 }
 
 function DefaultFieldWrapperForMoreOptions(props: IFieldWrapperForMoreOptions) {
@@ -55,6 +57,11 @@ function DefaultFieldWrapperForMoreOptions(props: IFieldWrapperForMoreOptions) {
 }
 
 export interface IDefaultSlateElementWrappersProps extends ISlateEditorWrapperElementProps {
+  /**
+   * Custom args to be passed
+   */
+  customArgs?: any;
+
   /**
    * Used to make text input fields
    */
@@ -216,6 +223,7 @@ function HTMLWrapper(props: IDefaultSlateElementWrappersProps) {
           resetBlur={null}
           unblur={null}
           value={props.element.html}
+          args={props.customArgs}
         />
       }
     >
@@ -326,6 +334,7 @@ function TextWrapper(props: IDefaultSlateElementWrappersProps) {
           resetBlur={null}
           unblur={null}
           value={props.element.html}
+          args={props.customArgs}
         />
       }
     >
@@ -405,6 +414,7 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
                 }].concat(props.featureSupport.availableTables)}
                 resetBlur={null}
                 unblur={null}
+                args={props.customArgs}
               />
             ) : null}
             <Button
@@ -412,24 +422,28 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
               label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTdLabel}
               onClick={props.helpers.insertTableColumn}
               disabled={false}
+              args={props.customArgs}
             />
             <Button
               id="table-add-tr"
               label={(props.baseI18n as IWrapperI18nRichTextInfo).formatAddTrLabel}
               onClick={props.helpers.insertTableRow}
               disabled={false}
+              args={props.customArgs}
             />
             <Button
               id="table-del-td"
               label={(props.baseI18n as IWrapperI18nRichTextInfo).formatDelTdLabel}
               onClick={props.helpers.deleteTableColumn}
               disabled={false}
+              args={props.customArgs}
             />
             <Button
               id="table-del-tr"
               label={(props.baseI18n as IWrapperI18nRichTextInfo).formatDelTrLabel}
               onClick={props.helpers.deleteTableRow}
               disabled={false}
+              args={props.customArgs}
             />
             <Button
               id="table-toggle-th"
@@ -437,6 +451,7 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
               onClick={props.helpers.toggleTable.bind(null, "thead")}
               disabled={!props.helpers.canToggleTable("thead")}
               selected={props.element.type === "th"}
+              args={props.customArgs}
             />
             <Button
               id="table-toggle-tfoot"
@@ -444,6 +459,7 @@ function TdAndTh(props: IDefaultSlateElementWrappersProps) {
               onClick={props.helpers.toggleTable.bind(null, "tfoot")}
               disabled={!props.helpers.canToggleTable("tfoot")}
               selected={parentTheadOrTbodyOrTfoot.type === "tfoot"}
+              args={props.customArgs}
             />
           </>
         }
@@ -574,10 +590,11 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
                     (props.baseI18n as IWrapperI18nRichTextInfo).setLink.placeholderLocalOnly
                 }
                 id="link-href"
+                args={props.customArgs}
               />
               {
                 linkOptions.length ?
-                  <FieldWrapperForMoreOptions label={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.templated}>
+                  <FieldWrapperForMoreOptions label={(props.baseI18n as IWrapperI18nRichTextInfo).setLink.templated} args={props.customArgs}>
                     <SelectField
                       id="link-thref"
                       value={(props.element as ILink).thref || ""}
@@ -596,6 +613,7 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
                       })))}
                       resetBlur={null}
                       unblur={null}
+                      args={props.customArgs}
                     />
                   </FieldWrapperForMoreOptions>
                   :
@@ -640,6 +658,7 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
               label={(props.baseI18n as IWrapperI18nRichTextInfo).loadVideo.label}
               placeholder={(props.baseI18n as IWrapperI18nRichTextInfo).loadVideo.placeholder}
               id="video-url"
+              args={props.customArgs}
             />
           }
           dropdownComponentWrapperTag="div"
@@ -683,6 +702,7 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
               onChangeByValue={updateAltB}
               label={props.baseI18n.alt}
               id="image-alt"
+              args={props.customArgs}
             />
           }
           dropdownComponentWrapperTag="div"
@@ -731,6 +751,7 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
               resetBlur={null}
               unblur={null}
               value={(props.element as ITitle).titleType || "h1"}
+              args={props.customArgs}
             />
           }
         >
@@ -791,6 +812,7 @@ export const defaultElementWrappers: ISlateEditorElementWrappers = {
               unblur={null}
               value={(props.element as IContainer).containerType || ""}
               displayEmpty={true}
+              args={props.customArgs}
             />
           }
         >

@@ -93,6 +93,8 @@ interface ISingleActionProps {
    */
   id: string;
 
+  customArgs: any;
+
   SelectField: React.ComponentType<IWrapperDrawerSelectFieldProps>;
 }
 
@@ -202,6 +204,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
     const SelectField = this.props.SelectField || DefaultWrapperDrawerSelectField;
     return (
       <SelectField
+        args={this.props.customArgs}
         id={this.props.id}
         label={this.props.name}
         onChangeByEvent={this.onActionValueChange}
@@ -298,10 +301,11 @@ export function ActionsOptions(props: IDrawerContainerProps) {
 
   // now we can return the whole box
   return (
-    <WrapperDrawerInternalPanelWrapper>
+    <WrapperDrawerInternalPanelWrapper args={props.customArgs}>
       {
         EVENTS.map((v, index) => (
           <SingleAction
+            customArgs={props.customArgs}
             key={v}
             name={v}
             actionValue={currentNode[v] || null}

@@ -44,6 +44,7 @@ export interface IDialogComponentProps {
     onClick: () => void;
     action: "primary" | "secondary";
   }>;
+  args?: any;
 }
 
 function DefaultDialog(props: IDialogComponentProps) {

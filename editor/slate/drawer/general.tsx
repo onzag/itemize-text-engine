@@ -24,6 +24,10 @@ export interface IWrapperDrawerTextFieldProps {
   onChangeByEvent: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onChangeByValue: (v: string) => void;
   id: string;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IWrapperDrawerSelectFieldProps {
@@ -38,6 +42,10 @@ export interface IWrapperDrawerSelectFieldProps {
   unblur: () => void;
   resetBlur: () => void;
   displayEmpty?: boolean;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IWrapperDrawerMultiSelectFieldProps {
@@ -49,6 +57,10 @@ export interface IWrapperDrawerMultiSelectFieldProps {
   options: Array<{ value: string; label: string | React.ReactNode; primary?: boolean  }>;
   unblur: () => void;
   resetBlur: () => void;
+  /**
+   * custom args passed
+   */
+  args: any;
 }
 
 export interface IWrapperDrawerCheckBoxProps {
@@ -178,13 +190,14 @@ export function GeneralOptions(props: IDrawerContainerProps) {
 
   // and return
   return (
-    <WrapperDrawerInternalPanelWrapper>
+    <WrapperDrawerInternalPanelWrapper args={props.customArgs}>
       <WrapperDrawerTextField
         value={name}
         label={props.baseI18n.name}
         onChangeByEvent={updateName}
         onChangeByValue={updateNameB}
         id="name"
+        args={props.customArgs}
       />
       {
         props.drawerExtras ? (

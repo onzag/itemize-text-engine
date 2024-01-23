@@ -72,6 +72,7 @@ export interface IWrapperDrawerInfoPanelWrapperProps {
   setSelectedOption: SetOptionTypeFn;
   setAccessibilitySelectedOption: SetOptionTypeFn;
   children: React.ReactNode;
+  args?: any;
 }
 
 export interface IWrapperDrawerTabsProps {
@@ -79,7 +80,8 @@ export interface IWrapperDrawerTabsProps {
   selectedOption: IOptionType;
   setSelectedOption: SetOptionTypeFn;
   setAccessibilitySelectedOption: SetOptionTypeFn;
-  options: Array<{ id: string; label: string; }>
+  options: Array<{ id: string; label: string; }>;
+  args?: any;
 }
 
 export function DefaultWrapperDrawerInfoPanelWrapper(props: IWrapperDrawerInfoPanelWrapperProps) {
@@ -258,7 +260,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   // now we return
   return (
     <>
-      <WrapperForTitle>
+      <WrapperForTitle args={props.customArgs}>
         {titleForNode}
       </WrapperForTitle>
       {settingsForNode}

@@ -50,6 +50,8 @@ interface ISingleTemplatingElementProps {
    */
   id: string;
 
+  customArgs: any;
+
   SelectField: React.ComponentType<IWrapperDrawerSelectFieldProps>;
 }
 
@@ -178,6 +180,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
         value={this.state.value}
         id={this.props.id}
         displayEmpty={true}
+        args={this.props.customArgs}
       />
     );
   }
@@ -310,7 +313,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
   // and return the thing
   const DrawerTemplatingContainerBox = props.DrawerTemplatingContainerBox || DefaultDrawerTemplatingContainerBox;
   return (
-    <DrawerTemplatingContainerBox>
+    <DrawerTemplatingContainerBox args={props.customArgs}>
       <SingleTemplatingElement
         name="context"
         i18nName={props.baseI18n.context}
@@ -320,6 +323,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         onChange={props.helpers.setContext}
         SelectField={props.WrapperDrawerSelectField}
         id="render-context"
+        customArgs={props.customArgs}
       />
       <SingleTemplatingElement
         name="if"
@@ -330,6 +334,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         onChange={props.helpers.setIfCondition}
         SelectField={props.WrapperDrawerSelectField}
         id="render-if"
+        customArgs={props.customArgs}
       />
       <SingleTemplatingElement
         name="each"
@@ -340,6 +345,7 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         onChange={props.helpers.setForEach}
         SelectField={props.WrapperDrawerSelectField}
         id="render-for-each"
+        customArgs={props.customArgs}
       />
     </DrawerTemplatingContainerBox>
   );
