@@ -2116,7 +2116,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
           {toolbar}
           {box}
           {drawerContainer}
-          {/* {fileLoadErrorDialogTODO} */}
+          {fileLoadErrorDialog}
           {imageInput}
           {fileInput}
         </>
@@ -2129,7 +2129,7 @@ export class DefaultSlateWrapper extends React.PureComponent<IDefaultSlateWrappe
             {box}
             {drawerContainer}
           </EditorContainer>
-          {/* {fileLoadErrorDialogTODO} */}
+          {fileLoadErrorDialog}
           {imageInput}
           {fileInput}
         </>
