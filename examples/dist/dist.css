@@ -90,10 +90,19 @@ html[dir=ltr] .rich-text ul li::before, html:not([dir]) .rich-text ul li::before
   margin-left: 1rem;
   margin-right: 0.5rem;
 }
-html[dir=rtl] .rich-text ul li > * {
+html[dir=rtl] .rich-text ul li > *,
+html[dir=rtl] .rich-text ul li > .sentence:first-of-type > *:first-of-type,
+html[dir=rtl] .rich-text ul li > .word:first-of-type > *:first-of-type,
+html[dir=rtl] .rich-text ul li > .sentence:first-of-type > .word:first-of-type > *:first-of-type {
   padding-right: 2.5rem;
 }
-html[dir=ltr] .rich-text ul li > *, html:not([dir]) .rich-text ul li > * {
+html[dir=ltr] .rich-text ul li > *, html:not([dir]) .rich-text ul li > *,
+html[dir=ltr] .rich-text ul li > .sentence:first-of-type > *:first-of-type,
+html:not([dir]) .rich-text ul li > .sentence:first-of-type > *:first-of-type,
+html[dir=ltr] .rich-text ul li > .word:first-of-type > *:first-of-type,
+html:not([dir]) .rich-text ul li > .word:first-of-type > *:first-of-type,
+html[dir=ltr] .rich-text ul li > .sentence:first-of-type > .word:first-of-type > *:first-of-type,
+html:not([dir]) .rich-text ul li > .sentence:first-of-type > .word:first-of-type > *:first-of-type {
   padding-left: 2.5rem;
 }
 .rich-text ul li > ul > li::before {

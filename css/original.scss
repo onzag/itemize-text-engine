@@ -126,7 +126,10 @@ $superblock-highlight-color: #33691e;
       }
     }
 
-    li>* {
+    li>*,
+    li>.sentence:first-of-type>*:first-of-type,
+    li>.word:first-of-type>*:first-of-type,
+    li>.sentence:first-of-type>.word:first-of-type>*:first-of-type {
       html[dir="rtl"] & {
         padding-right: 2.5rem;
       }

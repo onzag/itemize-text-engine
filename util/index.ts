@@ -1,3 +1,4 @@
+import { IWord } from "../serializer/types/segmenter-types/word";
 import { IRootLevelDocument, RichElement, deserialize } from "../serializer";
 import { IText } from "../serializer/types/text";
 import equals from "deep-equal";
@@ -26,17 +27,40 @@ export function countSize(root: IRootLevelDocument | RichElement | IText): numbe
  */
 const spaceRegex = /^\s+$/;
 export function countWords(root: IRootLevelDocument | RichElement | IText): number {
+  if ((root as IWord).type === "word") {
+    return 1;
+  }
   if (typeof (root as IText).text === "string") {
     return (root as IText).text.split(" ").filter((v) => v !== "" && !spaceRegex.test(v)).length;
   }
-  const counts = (root as IRootLevelDocument).children.map(countWords);
-  if (counts.length === 0) {
+  if ((root as IRootLevelDocument).children) {
+    const counts = (root as IRootLevelDocument).children.map(countWords);
+    if (counts.length === 0) {
+      return 0;
+    } else if (counts.length === 1) {
+      return counts[0];
+    }
+
+    return counts.reduce((a, b) => a + b);
+  } else {
     return 0;
-  } else if (counts.length === 1) {
-    return counts[0];
+  }
+}
+
+export function hasWords(root: IRootLevelDocument | RichElement | IText): boolean {
+  if ((root as IWord).type === "word") {
+    return true;
   }
 
-  return counts.reduce((a, b) => a + b);
+  if (typeof (root as IText).text === "string") {
+    return !!(root as IText).text.split(" ").filter((v) => v !== "" && !spaceRegex.test(v)).length;
+  }
+
+  if ((root as IRootLevelDocument).children) {
+    return (root as IRootLevelDocument).children.some(hasWords);
+  }
+
+  return false;
 }
 
 /**
@@ -44,6 +68,12 @@ export function countWords(root: IRootLevelDocument | RichElement | IText): numb
  * @param root 
  */
 export function countSizeAndWords(root: IRootLevelDocument | RichElement | IText): [number, number] {
+  if ((root as IWord).type === "word") {
+    return [
+      (root as IWord).children.map((v) => v.text.length).reduce((a, b) => a + b),
+      1,
+    ];
+  }
   if (typeof (root as IText).text === "string") {
     return [
       (root as IText).text.length,

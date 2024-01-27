@@ -29,6 +29,9 @@ import { IVoidBlock, registerVoidBlock } from "./types/void-block";
 import { IVoidSuperBlock, registerVoidSuperBlock } from "./types/void-superblock";
 import { IVoidInline, registerVoidInline } from "./types/void-inline";
 import { IUnmanaged, registerUnmanaged } from "./types/unmanaged";
+import { ISentence, registerSentence } from "./types/segmenter-types/sentence";
+import { IWord, registerWord } from "./types/segmenter-types/word";
+import { applySegmenterInDocument, SegmenterType } from "../segmenter";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -53,7 +56,14 @@ export interface IReactifyExtraOptions {
    * 
    * return an object or null
    */
-  onCustomAttributesFor?: (element: RichElement | IText) => any;
+  onCustomAttributesFor?: (
+    element: RichElement | IText,
+    info: {
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
+    },
+  ) => any;
 
   /**
    * use this to modify how the element renders
@@ -72,7 +82,11 @@ export interface IReactifyExtraOptions {
       Tag: string,
       defaultReturn: () => React.ReactNode,
       parent: RichElement | IRootLevelDocument,
+      trueParent: RichElement | IRootLevelDocument,
       tree: IRootLevelDocument,
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
     },
   ) => React.ReactNode;
 
@@ -80,7 +94,16 @@ export interface IReactifyExtraOptions {
    * Allows to wrap an element with features of the choosing
    * return the elementAsNode itself or a new node to replace it
    */
-  onCustomWrap?: (element: RichElement | IText, elementAsNode: React.ReactNode, key: string) => React.ReactNode;
+  onCustomWrap?: (
+    element: RichElement | IText,
+    elementAsNode: React.ReactNode,
+    key: string,
+    info: {
+      path: number[];
+      wordNumber?: number;
+      sentenceNumber?: number;
+    },
+  ) => React.ReactNode;
 }
 
 /**
@@ -142,10 +165,28 @@ export interface IReactifyArg<T> {
    */
   parent: RichElement | IRootLevelDocument;
   /**
+   * The true parent, which avoids sentences
+   * and words as parent as they are fake
+   * and don't exist in the AST in reality
+   */
+  trueParent: RichElement | IRootLevelDocument;
+  /**
+   * accumulated words
+   */
+  accumulatedWord: { value: number };
+  /**
+   * accumulated words
+   */
+  accumulatedSentence: { value: number };
+  /**
    * The tree this element comes from
    * or null if no tree is available
    */
   tree: IRootLevelDocument;
+  /**
+   * path of element
+   */
+  path: number[];
 }
 
 /**
@@ -195,6 +236,15 @@ export interface ISerializationRegistryType {
      */
     unmanaged: (n: HTMLElement) => IUnmanaged;
   };
+
+  /**
+   * UNSERIALIZABLES cannot be serialized and are void elements
+   * for reactification purposes they are used for segmentation and text analysis
+   */
+  UNSERIALIZABLES?: {
+    [type: string]: boolean;
+  }
+
 
   /**
    * REACTIFY allows to convert a given element that has been deserialized
@@ -338,7 +388,8 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   REACTIFY: {},
   MERGABLES: {},
   CUSTOM_NORMALIZER_POST: {},
-  CUSTOM_NORMALIZER_PRE: {}
+  CUSTOM_NORMALIZER_PRE: {},
+  UNSERIALIZABLES: {},
 }
 
 // NOW we register all the elements that are part of this
@@ -361,6 +412,8 @@ registerTableElements(SERIALIZATION_REGISTRY);
 registerVoidBlock(SERIALIZATION_REGISTRY);
 registerVoidInline(SERIALIZATION_REGISTRY);
 registerUnmanaged(SERIALIZATION_REGISTRY);
+registerSentence(SERIALIZATION_REGISTRY);
+registerWord(SERIALIZATION_REGISTRY);
 
 SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.document = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.container;
 SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.document = SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.container;
@@ -589,6 +642,12 @@ export interface IRootLevelDocument {
   rich: boolean;
   id: string;
   children: RichElement[];
+  /**
+   * specifies whether the document is semented
+   * this is used for word analysis and data display
+   * and should not be used for editing or normalizing
+   */
+  segmented?: boolean;
 }
 
 /**
@@ -597,7 +656,7 @@ export interface IRootLevelDocument {
  */
 export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
   IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITfoot | ITd |
-  ITh | IVoidBlock | IVoidInline | IVoidSuperBlock | IUnmanaged;
+  ITh | IVoidBlock | IVoidInline | IVoidSuperBlock | IUnmanaged | IWord | ISentence;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -798,6 +857,7 @@ const deserializeCache: Array<{
   doc: IRootLevelDocument;
   dontNormalize: boolean;
   useContextRulesOf: ITemplateArgContextDefinition;
+  segmenter: SegmenterType;
 }> = [];
 
 /**
@@ -811,12 +871,18 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   const dontNormalize = specialRules ? (specialRules.dontNormalize || false) : false;
   const useContextRulesOf = specialRules ? (specialRules.useContextRulesOf || null) : null;
   const ignoreNodesAt = specialRules ? (specialRules.ignoreNodesAt || null) : null;
+  const segmenter = specialRules ? (specialRules.segmenter || null) : null;
 
   // first we find if we have it in the cache when we use a string
   // as initial value
   if (typeof html === "string" && !ignoreNodesAt) {
     const cachedIndex = deserializeCache
-      .findIndex((v) => v.data === html && v.dontNormalize === dontNormalize && v.useContextRulesOf === useContextRulesOf);
+      .findIndex((v) =>
+        v.data === html &&
+        v.dontNormalize === dontNormalize &&
+        v.useContextRulesOf === useContextRulesOf &&
+        v.segmenter === segmenter
+      );
 
     if (cachedIndex !== -1) {
       const cached = deserializeCache[cachedIndex];
@@ -866,6 +932,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
         doc: comparer,
         dontNormalize,
         useContextRulesOf,
+        segmenter,
       });
 
       if (deserializeCache.length > deserializeCacheSize) {
@@ -903,12 +970,17 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
     normalize(newDocument, specialRules || null);
   }
 
+  if (segmenter) {
+    applySegmenterInDocument(newDocument, segmenter);
+  }
+
   if (!ignoreNodesAt) {
     deserializeCache.push({
       data,
       doc: newDocument,
       dontNormalize,
       useContextRulesOf,
+      segmenter,
     });
 
     if (deserializeCache.length > deserializeCacheSize) {
@@ -924,6 +996,10 @@ export function normalize(
   doc: IRootLevelDocument,
   specialRules?: ISpecialRules,
 ): IRootLevelDocument {
+  if (doc.segmented) {
+    throw new Error("Attempted to normalize a segmented tree, this is not allowed, segmented trees cannot be normalized");
+  }
+
   if (!doc.rich || (specialRules && specialRules.dontNormalize)) {
     return doc;
   }
@@ -964,6 +1040,18 @@ interface ISpecialRules {
    * avoid normalization altogether
    */
   dontNormalize?: boolean;
+  /**
+   * A segmenter to be used for segmenting the text
+   * values created using the segmenter are unsuitable for editing
+   * as they cannot be normalized
+   * 
+   * the segmenter is only applied once per element that has children that can be segmented
+   * 
+   * DO NOT use a segmenter for values intended for an editor, even when it should work in theory
+   * the segmenter is meant to be used for visualization purposes as editors are not expected
+   * to create or normalize values that are segmented
+   */
+  segmenter?: SegmenterType;
 }
 
 const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) => ({
@@ -1322,6 +1410,13 @@ export function normalizeElement(
   customExecution?: ICustomExecution,
   specialRules?: ISpecialRules,
 ) {
+  if ((element as any).segmented) {
+    throw new Error("Attempted to normalize a segmented document, this is not allowed");
+  }
+  if (element.type === "word" || element.type === "sentence") {
+    throw new Error("Attempted to normalize a segmented element, this is not allowed");
+  }
+
   if (specialRules && specialRules.dontNormalize) {
     return;
   }
@@ -1334,7 +1429,7 @@ export function normalizeElement(
   if (!primaryExecution.workOnOriginal) {
     executionRoot = shallowElementCopy(root);
     secondaryExecution = standardExecFn(executionRoot);
-    executionElement = getNodeFor(path, executionRoot) as RichElement;
+    executionElement = getNodeFor(path, executionRoot) as any;
   }
 
   internalNormalizeElement(executionElement, path, executionRoot, primaryExecution, secondaryExecution, specialRules);

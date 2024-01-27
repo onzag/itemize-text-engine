@@ -206,7 +206,14 @@ export function registerText(registry: ISerializationRegistryType) {
     }
 
     if (arg.extraOptions && arg.extraOptions.onCustomAttributesFor) {
-      const extraProps = arg.extraOptions.onCustomAttributesFor(arg.element);
+      const extraProps = arg.extraOptions.onCustomAttributesFor(
+        arg.element,
+        {
+          path: arg.path,
+          sentenceNumber: arg.accumulatedSentence.value,
+          wordNumber: arg.accumulatedWord.value,
+        },
+      );
       if (extraProps) {
         Object.keys(extraProps).forEach((attr) => {
           newCustomProps[attr] = extraProps[attr];
@@ -224,7 +231,11 @@ export function registerText(registry: ISerializationRegistryType) {
         Tag: "span",
         defaultReturn: () => (<span {...newCustomProps} />),
         parent: arg.parent,
+        trueParent: arg.trueParent,
         tree: arg.tree,
+        path: arg.path,
+        sentenceNumber: arg.accumulatedSentence.value,
+        wordNumber: arg.accumulatedWord.value,
       });
     } else {
       toRender = (
@@ -233,7 +244,16 @@ export function registerText(registry: ISerializationRegistryType) {
     }
 
     if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
-      return arg.extraOptions.onCustomWrap(arg.element, toRender, ((toRender as any) && (toRender as any).key) || null);
+      return arg.extraOptions.onCustomWrap(
+        arg.element,
+        toRender,
+        ((toRender as any) && (toRender as any).key) || null,
+        {
+          path: arg.path,
+          sentenceNumber: arg.accumulatedSentence.value,
+          wordNumber: arg.accumulatedWord.value,
+        },
+      );
     }
 
     return (

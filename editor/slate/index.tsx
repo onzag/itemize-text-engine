@@ -3211,7 +3211,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         // we don't care as we are not using the onCustom function
         parent: null,
+        trueParent: null,
         tree: null,
+        path: [],
+        accumulatedSentence: null,
+        accumulatedWord: null,
       }) as any;
 
       const contextSwichContext = this.getContextFor(element as any, "final", true);
@@ -3320,7 +3324,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // we don't care as we are not using the onCustom function
       // this will prevent normalization but that's fine
       parent: null,
+      trueParent: null,
       tree: null,
+      path: [],
+      accumulatedSentence: null,
+      accumulatedWord: null,
     }) as any;
   }
 

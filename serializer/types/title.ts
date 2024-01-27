@@ -9,6 +9,8 @@ import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } 
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
+import { ISentence } from "./segmenter-types/sentence";
+import { IWord } from "./segmenter-types/word";
 import { IText } from "./text";
 
 /**
@@ -100,5 +102,5 @@ export interface ITitle extends IElementBase {
    * The title only has one children and it's text
    * as it only contains text within it
    */
-  children: Array<IText | ILink | IFile>;
+  children: Array<IText | ILink | IFile | ISentence | IWord>;
 }

@@ -9,7 +9,9 @@ import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType} f
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
-import { IText, STANDARD_TEXT_NODE } from "./text";
+import { ISentence } from "./segmenter-types/sentence";
+import { IWord } from "./segmenter-types/word";
+import { IText } from "./text";
 
 /**
  * The function that registers and adds the quote element in the given
@@ -108,5 +110,5 @@ export interface IQuote extends IElementBase {
   /**
    * Represents the children
    */
-  children: Array<IText | ILink | IFile>;
+  children: Array<IText | ILink | IFile | ISentence | IWord>;
 }

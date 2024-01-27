@@ -390,22 +390,30 @@ export function serializeElementBase(
 
   // fi we have specified children
   if (children) {
-    // then we loop into them
-    children.forEach((c) => {
+    const processChild = (c: IText | RichElement) => {
       // if it's a text node
       if ((c as IText).text) {
         // then we use the text conversion function
         const textNode: Node = registry.SERIALIZE.text(c as IText);
         elementComponent.appendChild(textNode);
-      } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        // if it's another type then we pick the function
-        const fn = registry.SERIALIZE[(c as RichElement).type];
-        // get the child element
-        const childElement = fn(c as RichElement);
-        // and push that
-        elementComponent.appendChild(childElement);
+      } else if (registry.UNSERIALIZABLES[(c as RichElement).type]) {
+        // skip unserializables and put the children straight
+        // onto the parent
+        if ((c as RichElement).children) {
+          (c as RichElement).children.forEach(processChild);
+        } else if (registry.SERIALIZE[(c as RichElement).type]) {
+          // if it's another type then we pick the function
+          const fn = registry.SERIALIZE[(c as RichElement).type];
+          // get the child element
+          const childElement = fn(c as RichElement);
+          // and push that
+          elementComponent.appendChild(childElement);
+        }
       }
-    });
+    };
+
+    // then we loop into them
+    children.forEach(processChild);
   }
 
   // return it
@@ -512,7 +520,14 @@ export function reactifyElementBase(
               templateIgnoreContextualChanges: true,
               extraOptions: arg.extraOptions,
               parent: arg.parent,
+              trueParent: (
+                (base as any).type === "sentence"
+                || (base as any).type === "word"
+              ) ? arg.trueParent : (base as RichElement),
               tree: arg.tree,
+              accumulatedSentence: arg.accumulatedSentence,
+              accumulatedWord: arg.accumulatedWord,
+              path: arg.path,
             }
           );
         }
@@ -583,7 +598,14 @@ export function reactifyElementBase(
             templateIgnoreContextualChanges: true,
             extraOptions: arg.extraOptions,
             parent: arg.parent,
+            trueParent: (
+              (base as any).type === "sentence"
+              || (base as any).type === "word"
+            ) ? arg.trueParent : (base as RichElement),
             tree: arg.tree,
+            accumulatedSentence: arg.accumulatedSentence,
+            accumulatedWord: arg.accumulatedWord,
+            path: arg.path,
           }
         );
       })
@@ -640,13 +662,20 @@ export function reactifyElementBase(
           key: index,
           extraOptions: arg.extraOptions,
           parent: base as RichElement,
+          trueParent: (
+            (base as any).type === "sentence"
+            || (base as any).type === "word"
+          ) ? arg.trueParent : (base as RichElement),
           tree: arg.tree,
+          accumulatedSentence: arg.accumulatedSentence,
+          accumulatedWord: arg.accumulatedWord,
+          path: arg.path,
         };
 
         // and then we call the reactify
         if ((c as IText).text) {
           return registry.REACTIFY.text(specificChildTemplateOptions);
-        } else if (registry.SERIALIZE[(c as RichElement).type]) {
+        } else if (registry.REACTIFY[(c as RichElement).type]) {
           return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
         }
 
@@ -805,13 +834,20 @@ export function reactifyElementBase(
               key: index,
               extraOptions: arg.extraOptions,
               parent: base as RichElement,
+              trueParent: (
+                (base as any).type === "sentence"
+                || (base as any).type === "word"
+              ) ? arg.trueParent : (base as RichElement),
               tree: arg.tree,
+              accumulatedSentence: arg.accumulatedSentence,
+              accumulatedWord: arg.accumulatedWord,
+              path: arg.path,
             };
 
             // and then we call the reactify
             if ((c as IText).text) {
               return registry.REACTIFY.text(specificChildTemplateOptions);
-            } else if (registry.SERIALIZE[(c as RichElement).type]) {
+            } else if (registry.REACTIFY[(c as RichElement).type]) {
               return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
             }
 
@@ -842,7 +878,14 @@ export function reactifyElementBase(
   }
 
   if (arg.extraOptions && arg.extraOptions.onCustomAttributesFor) {
-    const extraProps = arg.extraOptions.onCustomAttributesFor(base as any);
+    const extraProps = arg.extraOptions.onCustomAttributesFor(
+      base as any,
+      {
+        path: arg.path,
+        sentenceNumber: arg.accumulatedSentence.value,
+        wordNumber: arg.accumulatedWord.value,
+      },
+    );
     if (extraProps) {
       Object.keys(extraProps).forEach((attr) => {
         finalProps[attr] = extraProps[attr];
@@ -900,7 +943,14 @@ export function reactifyElementBase(
                 styleHover,
                 defaultReturn: defaultReturn.bind(null, styleActive, styleHover),
                 parent: arg.parent,
+                trueParent: (
+                  (base as any).type === "sentence"
+                  || (base as any).type === "word"
+                ) ? arg.trueParent : (base as RichElement),
                 tree: arg.tree,
+                path: arg.path,
+                sentenceNumber: arg.accumulatedSentence.value,
+                wordNumber: arg.accumulatedWord.value,
               },
             );
           } else {
@@ -908,7 +958,16 @@ export function reactifyElementBase(
           }
 
           if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
-            return arg.extraOptions.onCustomWrap(base as any, toRender, ((toRender as any) && (toRender as any).key) || null);
+            return arg.extraOptions.onCustomWrap(
+              base as any,
+              toRender,
+              ((toRender as any) && (toRender as any).key) || null,
+              {
+                path: arg.path,
+                sentenceNumber: arg.accumulatedSentence.value,
+                wordNumber: arg.accumulatedWord.value,
+              },
+            );
           } else {
             return toRender;
           }

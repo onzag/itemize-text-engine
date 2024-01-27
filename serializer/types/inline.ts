@@ -9,6 +9,7 @@
 import { IReactifyArg, ISerializationRegistryType, deserializeChildrenForNode } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IText, STANDARD_TEXT_NODE } from "./text";
+import { IWord } from "./segmenter-types/word";
 
 /**
  * The function that registers and adds the inline in the given
@@ -106,5 +107,5 @@ export interface IInline extends IElementBase {
    * It can have as many children as it requires
    * but not text directly
    */
-  children: IText[];
+  children: Array<IText | IWord>;
 }

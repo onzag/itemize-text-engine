@@ -257,6 +257,14 @@ export function renderTemplateDynamically(
     return null;
   }
 
+  const accumulatorSentence = {
+    value: 0,
+  }
+
+  const accumulatorWord = {
+    value: 0,
+  }
+
   const toReturn = (
     <>
       {
@@ -271,6 +279,10 @@ export function renderTemplateDynamically(
             extraOptions: options,
             parent: document,
             tree: document,
+            accumulatedSentence: accumulatorSentence,
+            accumulatedWord: accumulatorWord,
+            path: [index],
+            trueParent: document,
           });
         })
       }
