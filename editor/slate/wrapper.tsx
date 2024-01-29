@@ -427,11 +427,6 @@ export interface IDefaultSlateWrapperProps extends ISlateEditorWrapperBaseProps 
   DrawerSpacer?: DrawerSpacerComponent;
 
   /**
-   * Customization for the 
-   */
-  DrawerTemplatingContainerBox?: React.ComponentType<IDrawerTemplatingContainerBoxProps>;
-
-  /**
    * Customization for the drawer
    * the body object containment itself
    */
@@ -576,14 +571,6 @@ function DefaultEditorContainer(props: IEditorContainerProps) {
   );
 }
 
-export interface IDrawerTemplatingContainerBoxProps {
-  children: React.ReactNode;
-  /**
-   * custom args passed
-   */
-  args: any;
-}
-
 /**
  * An utility to define a single templating option
  * for usage in a select field
@@ -646,6 +633,10 @@ export interface IToolbarProps {
    * Whether the drawer is open
    */
   drawerOpen: boolean;
+  /**
+   * custom args provided
+   */
+  args: any;
 }
 
 const DefaultToolbar = React.forwardRef((props: IToolbarProps, ref: React.ForwardedRef<HTMLElement>) => {
@@ -727,40 +718,6 @@ interface RichTextEditorToolbarState {
 
 interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps {
 }
-
-// function elementFastKeyReturn(
-//   props: RichTextEditorToolbarElementProps,
-//   element: React.ReactNode,
-//   altBadgedChildren: React.ReactNode,
-//   priority: number,
-//   disabled: boolean,
-//   useStyleTransform?: boolean,
-//   useTriggerAltAfterAction?: boolean,
-//   fastKeyOverride?: string,
-// ): any {
-//   const fastKey = fastKeyOverride || props.fastKey;
-
-//   if (!fastKey) {
-//     return element;
-//   }
-
-//   return (
-//     <AltBadgeReactioner
-//       reactionKey={fastKey}
-//       priority={priority}
-//       disabled={disabled || !props.state.currentSelectedElement}
-//       altBadgedChildren={altBadgedChildren}
-//       label={fastKey === "escape" ? "esc" : null}
-//       tabbable={fastKey !== "escape"}
-//       useTransform={useStyleTransform ? "close" : null}
-//       triggerAltAfterAction={useTriggerAltAfterAction}
-//       selector="button"
-//       onTabOutTrigger="escape"
-//     >
-//       {element}
-//     </AltBadgeReactioner>
-//   );
-// }
 
 export interface IToolbarButtonProps {
   title: string;
@@ -1391,10 +1348,28 @@ const toolbarRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, 
   table: Table,
 }
 
-interface IToolbarDrawerButtonProps {
+export interface IToolbarDrawerButtonProps {
+  /**
+   * state of the editor
+   */
+  state: ISlateEditorInternalStateType;
+  /**
+   * is the drawer open
+   */
   drawerOpen: boolean;
+  /**
+   * toggle the drawer
+   * @returns 
+   */
   toggleDrawer: () => void;
+  /**
+   * disjointd mode
+   */
   disjointedMode: boolean;
+  /**
+   * Custom args provided
+   */
+  args?: any;
 };
 
 function DefaultToolbarDrawerToggleButton(props: IToolbarDrawerButtonProps) {
@@ -1498,9 +1473,11 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
     let drawerButton = (
       this.props.shouldHaveDrawer() ?
         <DrawerToggleComponent
+          state={this.props.state}
           drawerOpen={this.props.drawerOpen}
           toggleDrawer={this.props.toggleDrawer}
           disjointedMode={this.props.disjointedMode}
+          args={this.props.customArgs}
         /> :
         null
     );
@@ -1555,6 +1532,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         }}
         toolbarContents={toolbarFormMapped}
         ref={this.appBarHeaderRef}
+        args={this.props.customArgs}
       />
     );
 

@@ -9,7 +9,8 @@ import React, { useCallback } from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import { Path } from "slate";
 import equals from "deep-equal";
-import { DefaultWrapperDrawerCheckBoxField, DefaultWrapperDrawerInternalPanelWrapper, DefaultWrapperDrawerMultiSelectField, DefaultWrapperDrawerTextField, IWrapperDrawerTextFieldProps } from "./general";
+import { DefaultWrapperDrawerCheckBoxField, DefaultWrapperDrawerInternalPanelWrapper, DefaultWrapperDrawerMultiSelectField,
+  DefaultWrapperDrawerTextField, IWrapperDrawerTextFieldProps } from "./general";
 
 /**
  * The single style option props that define a single

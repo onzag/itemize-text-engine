@@ -81,6 +81,7 @@ export interface IWrapperDrawerTabsProps {
   setSelectedOption: SetOptionTypeFn;
   setAccessibilitySelectedOption: SetOptionTypeFn;
   options: Array<{ id: string; label: string; }>;
+  disabled: boolean;
   args?: any;
 }
 
@@ -216,6 +217,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                 selectedOption={location as any}
                 setSelectedOption={setLocationCallback}
                 setAccessibilitySelectedOption={useAccessibilitySelectedOption}
+                disabled={!props.state.currentSelectedElement}
                 options={[
                   {
                     id: "MAIN",

@@ -5,10 +5,10 @@
  */
 
 import { getContextFor, RichElement } from "../../../serializer";
-import React, { useCallback } from "react";
-import type { IDrawerContainerProps, IDrawerTemplatingContainerBoxProps, ISingleTemplatingElementOption } from "../wrapper";
+import React from "react";
+import type { IDrawerContainerProps, ISingleTemplatingElementOption } from "../wrapper";
 import { Path } from "slate";
-import { DefaultWrapperDrawerSelectField, IWrapperDrawerSelectFieldProps } from "./general";
+import { DefaultWrapperDrawerInternalPanelWrapper, DefaultWrapperDrawerSelectField, IWrapperDrawerSelectFieldProps } from "./general";
 
 /**
  * The single templating element option props are the props
@@ -186,14 +186,6 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
   }
 }
 
-function DefaultDrawerTemplatingContainerBox(props: IDrawerTemplatingContainerBoxProps) {
-  return (
-    <div className="staleEditorDrawerTemplatingContainerBox">
-      {props.children}
-    </div>
-  )
-}
-
 /**
  * Provides the component that contains the both selectors for both
  * each and context key for usage in templating
@@ -311,9 +303,9 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
   }
 
   // and return the thing
-  const DrawerTemplatingContainerBox = props.DrawerTemplatingContainerBox || DefaultDrawerTemplatingContainerBox;
+  const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
   return (
-    <DrawerTemplatingContainerBox args={props.customArgs}>
+    <WrapperDrawerInternalPanelWrapper args={props.customArgs}>
       <SingleTemplatingElement
         name="context"
         i18nName={props.baseI18n.context}
@@ -347,6 +339,6 @@ export function TemplatingOptions(props: IDrawerContainerProps) {
         id="render-for-each"
         customArgs={props.customArgs}
       />
-    </DrawerTemplatingContainerBox>
+    </WrapperDrawerInternalPanelWrapper>
   );
 }

@@ -20,7 +20,7 @@ interface ITemplateOption {
   primary: boolean;
 };
 
-export interface IElementWrapperButton {
+export interface IElementWrapperButtonProps {
   label: string;
   id: string;
   disabled: boolean;
@@ -29,7 +29,7 @@ export interface IElementWrapperButton {
   args: any;
 }
 
-function DefaultElementWrapperButtonComponent(props: IElementWrapperButton) {
+function DefaultElementWrapperButtonComponent(props: IElementWrapperButtonProps) {
   return (
     <button
       className={"slateEditorElementWrapperButton " + (props.selected ? " selected" : "")}
@@ -41,13 +41,13 @@ function DefaultElementWrapperButtonComponent(props: IElementWrapperButton) {
   );
 }
 
-export interface IFieldWrapperForMoreOptions {
+export interface IFieldWrapperForMoreOptionsProps {
   label: string;
   children: React.ReactNode;
   args: any;
 }
 
-function DefaultFieldWrapperForMoreOptions(props: IFieldWrapperForMoreOptions) {
+function DefaultFieldWrapperForMoreOptions(props: IFieldWrapperForMoreOptionsProps) {
   return (
     <div className="slateEditorFieldWrapperForMoreOptions">
       <div className="slateEditorFieldWrapperForMoreOptionsLabel">{props.label}</div>
@@ -85,7 +85,7 @@ export interface IDefaultSlateElementWrappersProps extends ISlateEditorWrapperEl
   /**
    * Buttons used within the element wrappers
    */
-  ElementWrapperButton?: React.ComponentType<IElementWrapperButton>;
+  ElementWrapperButton?: React.ComponentType<IElementWrapperButtonProps>;
 
   /**
    * The dropdown component to use
@@ -108,7 +108,7 @@ export interface IDefaultSlateElementWrappersProps extends ISlateEditorWrapperEl
    * Used mainly in the templated element that it wraps in order to say that
    * there are more options
    */
-  FieldWrapperForMoreOptions?: React.ComponentType<IFieldWrapperForMoreOptions>;
+  FieldWrapperForMoreOptions?: React.ComponentType<IFieldWrapperForMoreOptionsProps>;
 }
 
 function getVideoURL(v: IVideo) {
