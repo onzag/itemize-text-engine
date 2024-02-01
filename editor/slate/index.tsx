@@ -18,7 +18,7 @@ import {
 } from "../../serializer";
 import { convertStyleStringToReactObject, IUIHandlerProps } from "../../serializer/base";
 import { IVideo } from "../../serializer/types/video";
-import prettyBytes from "pretty-bytes";
+import prettyBytes from "../../util/pretty-bytes";
 import { IContainer } from "../../serializer/types/container";
 import { IFile } from "../../serializer/types/file";
 import { IImage } from "../../serializer/types/image";

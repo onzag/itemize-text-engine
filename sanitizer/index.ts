@@ -355,27 +355,6 @@ export function postprocess(
           node.parentElement && node.parentElement.removeChild(node);
         }
       } else {
-        // const domain = process.env.NODE_ENV === "production" ? context.config.productionHostname : context.config.developmentHostname;
-        // const absolutedFile = context.forMail ? null : fileURLAbsoluter(
-        //   domain,
-        //   context.config.containersHostnamePrefixes,
-        //   currentFile,
-        //   context.itemDefinition,
-        //   context.forId,
-        //   context.forVersion || null,
-        //   context.containerId,
-        //   context.include,
-        //   context.mediaProperty,
-        //   context.cacheFiles,
-        //   context.forceFullURLs,
-        // );
-        // const srcset = context.forMail ? null : imageSrcSetRetriever(absolutedFile, context.mediaProperty);
-
-        // let imageFail = "/rest/resource/image-fail.svg";
-        // if (context.forceFullURLs || context.forMail) {
-        //   imageFail = "https://" + domain + imageFail;
-        // }
-
         // srcset
         if (!options.mail && currentFile.srcSet) {
           node.setAttribute("srcset", currentFile.srcSet);
