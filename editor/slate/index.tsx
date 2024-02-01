@@ -367,63 +367,71 @@ let ALL_IS_LOADED: boolean = false;
  * @ignore
  */
 function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
-  // so first we split within the rules
-  Array.from(stylesheet.cssRules).forEach((r) => {
-    if (r instanceof CSSMediaRule) {
-      calculateStylesheet(r as CSSMediaRule);
-      return;
-    } else if (!(r instanceof CSSStyleRule)) {
-      return;
-    }
+  try {
+    // so first we split within the rules
+    Array.from(stylesheet.cssRules).forEach((r) => {
+      if (r instanceof CSSMediaRule) {
+        calculateStylesheet(r as CSSMediaRule);
+        return;
+      } else if (!(r instanceof CSSStyleRule)) {
+        return;
+      }
 
-    // and now we need the selector part that selects, and split it so we have
-    // something like [".trusted", ".rich-text--something"]
-    // selectorText is supported in chromium based browsers but not all, so we have a more expensive
-    // fallback in place for that
-    const selectorSplitted = ((r as any).selectorText as string || r.cssText.split("{")[0].trim()).split(" ");
+      // and now we need the selector part that selects, and split it so we have
+      // something like [".trusted", ".rich-text--something"]
+      // selectorText is supported in chromium based browsers but not all, so we have a more expensive
+      // fallback in place for that
+      const selectorSplitted = ((r as any).selectorText as string || r.cssText.split("{")[0].trim()).split(" ");
 
-    // now we take that selection, we are only concerned with the classes
-    // that match our prefixed things
-    selectorSplitted.forEach((sbase) => {
-      let internalSelectorSplitted = sbase.split(".");
-      internalSelectorSplitted.shift();
+      // now we take that selection, we are only concerned with the classes
+      // that match our prefixed things
+      selectorSplitted.forEach((sbase) => {
+        let internalSelectorSplitted = sbase.split(".");
+        internalSelectorSplitted.shift();
 
-      internalSelectorSplitted.forEach((s) => {
-        // now we take the class name
-        let className = s;
-        if (className.includes(":")) {
-          className = className.split(":")[0];
-        }
-        if (className.endsWith(",")) {
-          className = className.substr(0, className.length - 1);
-        }
+        internalSelectorSplitted.forEach((s) => {
+          // now we take the class name
+          let className = s;
+          if (className.includes(":")) {
+            className = className.split(":")[0];
+          }
+          if (className.endsWith(",")) {
+            className = className.substr(0, className.length - 1);
+          }
 
-        // and we check whether it matches any of our prefixes that
-        // make it a valid class of the given type
-        if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
-          const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
-          if (!ALL_CONTAINERS.includes(toPush)) {
-            ALL_CONTAINERS.push(toPush);
+          // and we check whether it matches any of our prefixes that
+          // make it a valid class of the given type
+          if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
+            const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
+            if (!ALL_CONTAINERS.includes(toPush)) {
+              ALL_CONTAINERS.push(toPush);
+            }
+          } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
+            const toPush = className.substr(TABLE_CLASS_PREFIX.length);
+            if (!ALL_TABLES.includes(toPush)) {
+              ALL_TABLES.push(toPush);
+            }
+          } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
+            const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
+            if (!ALL_CUSTOM.includes(toPush)) {
+              ALL_CUSTOM.push(toPush);
+            }
+          } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
+            const toPush = className.substr(RICH_TEXT_CLASS_PREFIX.length);
+            if (!ALL_RICH_CLASSES.includes(toPush)) {
+              ALL_RICH_CLASSES.push(toPush);
+            }
           }
-        } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
-          const toPush = className.substr(TABLE_CLASS_PREFIX.length);
-          if (!ALL_TABLES.includes(toPush)) {
-            ALL_TABLES.push(toPush);
-          }
-        } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
-          const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
-          if (!ALL_CUSTOM.includes(toPush)) {
-            ALL_CUSTOM.push(toPush);
-          }
-        } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
-          const toPush = className.substr(RICH_TEXT_CLASS_PREFIX.length);
-          if (!ALL_RICH_CLASSES.includes(toPush)) {
-            ALL_RICH_CLASSES.push(toPush);
-          }
-        }
+        });
       });
     });
-  });
+  } catch (err) {
+    if (stylesheet instanceof CSSStyleSheet) {
+      console.warn("Could not process stylesheet", stylesheet);
+    } else {
+      throw err;
+    }
+  }
 }
 
 /**
@@ -439,12 +447,19 @@ const ALL_PROMISE = new Promise<void>(async (resolve) => {
     return;
   }
   if (typeof document !== "undefined") {
-    const allLinks = document.head.querySelectorAll("link");
+    const allLinks: NodeListOf<HTMLLinkElement> = document.head.querySelectorAll("link[rel='stylesheet']");
     const allStyles = document.head.querySelectorAll("style");
 
-    // const stylesheetHrefPrefix = location.protocol + "//" + location.host + "/rest/resource/build";
-
-    const totalStyleSheetExpectedCount = allLinks.length + allStyles.length;
+    // expected to load count
+    const totalStyleSheetExpectedCount = (window as any).SLATE_EDITOR_STYLESHEETS_PREFIX ? (
+      Array.from(allLinks).filter((s) => {
+        if ((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX) {
+          return s.href && s.href.startsWith((window as any).SLATE_EDITOR_STYLESHEETS_PREFIX)
+        } else {
+          return true;
+        }
+      }).length
+    ) : (allLinks.length + allStyles.length);
 
     // now we got to see if by the time this promise is running
     // it is already done loading
@@ -556,6 +571,8 @@ const ALL_PROMISE = new Promise<void>(async (resolve) => {
         });
       }
     }
+  } else {
+    resolve();
   }
 });
 

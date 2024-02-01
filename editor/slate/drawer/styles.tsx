@@ -319,7 +319,7 @@ export function StylesOptions(props: IDrawerContainerProps) {
   const WrapperDrawerInternalPanelWrapper = props.WrapperDrawerInternalPanelWrapper || DefaultWrapperDrawerInternalPanelWrapper;
 
   return (
-    <WrapperDrawerInternalPanelWrapper args={this.props.customArgs}>
+    <WrapperDrawerInternalPanelWrapper args={props.customArgs}>
       {imgStandalone}
       {
         props.featureSupport.supportsRichClasses ?

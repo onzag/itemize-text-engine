@@ -1396,6 +1396,8 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
     this.state = {
       isReady: false,
     }
+
+    this.appBarHeaderRef = React.createRef();
   }
 
   componentDidMount() {
