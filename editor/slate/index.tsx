@@ -3940,7 +3940,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       type: "tr",
       children: currentRow.children.map((v) => (
         {
-          type: "td",
+          type: "td" as "td",
           children: [
             STANDARD_PARAGRAPH(),
           ],
