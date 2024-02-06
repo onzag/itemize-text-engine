@@ -1150,7 +1150,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertTemplateText, null, null)}
       htmlEntity="text"
-      type="table"
+      type="template-text"
       disjointedMode={props.disjointedMode}
       count={templateTextAmount}
     />
@@ -1217,7 +1217,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
       selected={false}
       onClick={callFn.bind(null, props.helpers.focus, props.helpers.insertTemplateHTML, null, null)}
       htmlEntity="html"
-      type="table"
+      type="template-html"
       disjointedMode={props.disjointedMode}
       count={templateHTMLAmount}
     />

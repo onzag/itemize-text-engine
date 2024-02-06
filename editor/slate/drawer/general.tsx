@@ -92,7 +92,7 @@ export function DefaultWrapperDrawerSelectField(props: IWrapperDrawerSelectField
     <div className="slateEditorWrapperDrawerSelectField">
       <label>{props.label}</label>
       <select
-        value={props.value}
+        value={props.value || ""}
         onChange={props.onChangeByEvent}
         disabled={props.disabled}
         placeholder={props.placeholder}
@@ -120,7 +120,7 @@ export function DefaultWrapperDrawerMultiSelectField(props: IWrapperDrawerMultiS
       <label>{props.label}</label>
       <select
         multiple={true}
-        value={props.values}
+        value={props.values || []}
         onChange={handleSelectChange}
         disabled={props.disabled}
       >

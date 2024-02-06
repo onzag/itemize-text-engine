@@ -3,5 +3,5 @@ import createDOMPurify from "dompurify";
 
 export const JSDOM = JSDOMDef;
 
-export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
+export const DOMWindow = JSDOM ? (new JSDOM("<!DOCTYPE html>")).window : window;
 export const DOMPurify = createDOMPurify(DOMWindow);

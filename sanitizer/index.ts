@@ -1,5 +1,4 @@
-import DOMPurify from "dompurify";
-import { DOMWindow } from "../serializer/dom";
+import { DOMWindow, DOMPurify } from "../serializer/dom";
 
 /**
  * Represents the context that is used in order

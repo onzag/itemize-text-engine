@@ -222,7 +222,7 @@ function HTMLWrapper(props: IDefaultSlateElementWrappersProps) {
           }))}
           resetBlur={null}
           unblur={null}
-          value={props.element.html}
+          value={props.element.html || null}
           args={props.customArgs}
         />
       }
@@ -333,7 +333,7 @@ function TextWrapper(props: IDefaultSlateElementWrappersProps) {
           }))}
           resetBlur={null}
           unblur={null}
-          value={props.element.html}
+          value={props.element.textContent || null}
           args={props.customArgs}
         />
       }

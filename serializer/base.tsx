@@ -401,14 +401,14 @@ export function serializeElementBase(
         // onto the parent
         if ((c as RichElement).children) {
           (c as RichElement).children.forEach(processChild);
-        } else if (registry.SERIALIZE[(c as RichElement).type]) {
-          // if it's another type then we pick the function
-          const fn = registry.SERIALIZE[(c as RichElement).type];
-          // get the child element
-          const childElement = fn(c as RichElement);
-          // and push that
-          elementComponent.appendChild(childElement);
         }
+      } else if (registry.SERIALIZE[(c as RichElement).type]) {
+        // if it's another type then we pick the function
+        const fn = registry.SERIALIZE[(c as RichElement).type];
+        // get the child element
+        const childElement = fn(c as RichElement);
+        // and push that
+        elementComponent.appendChild(childElement);
       }
     };
 
