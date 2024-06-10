@@ -551,6 +551,8 @@ export function postprocess(
     ) {
       if (
         !node.classList.contains("container") &&
+        !node.classList.contains("video") &&
+        !node.classList.contains("video-container") &&
         !Array.from(node.classList).some((v) => v.startsWith("container-") || v.startsWith("custom-"))
       ) {
         node.classList.add("container");

@@ -867,7 +867,11 @@ const deserializeCache: Array<{
  * it will be efficient and return such comparer instead
  * @returns a root level document
  */
-export function deserialize(html: string | Node[], comparer?: IRootLevelDocument, specialRules?: ISpecialRules) {
+export function deserialize(
+  html: string | Node[],
+  comparer?: IRootLevelDocument,
+  specialRules?: ISpecialRules,
+) {
   const dontNormalize = specialRules ? (specialRules.dontNormalize || false) : false;
   const useContextRulesOf = specialRules ? (specialRules.useContextRulesOf || null) : null;
   const ignoreNodesAt = specialRules ? (specialRules.ignoreNodesAt || null) : null;
@@ -1030,7 +1034,11 @@ interface ICustomExecution {
   moveNodeAt: (fromPath: number[], toPath: number[]) => void;
 };
 
-interface ISpecialRules {
+export interface IPlugin {
+
+}
+
+export interface ISpecialRules {
   ignoreNodesAt?: Array<number[]>;
   /**
    * This should be the root context
