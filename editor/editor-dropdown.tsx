@@ -399,7 +399,7 @@ export function EditorDropdown(props: IEditorDropdown) {
         props.onClose();
       }
     }
-  }, []);
+  }, [props.onClose]);
 
   const updatePosDelayed = useCallback(() => {
     setTimeout(updatePos, 50);
@@ -506,7 +506,7 @@ export function EditorDropdown(props: IEditorDropdown) {
           style: {
             display: props.dropdownComponentWrapperHidden ? "none" : "contents",
             ...(props.dropdownComponentWrapperProps?.style || {})
-          }
+          },
         }}
         ref={boxRef}
       >

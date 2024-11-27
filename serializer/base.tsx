@@ -834,6 +834,9 @@ export function reactifyElementBase(
               key: index,
               extraOptions: arg.extraOptions,
               parent: base as RichElement,
+              // we are passing the true parent to the children
+              // therefore the true parent cannot be passed
+              // as sentence or word since they don't exist
               trueParent: (
                 (base as any).type === "sentence"
                 || (base as any).type === "word"
@@ -943,10 +946,10 @@ export function reactifyElementBase(
                 styleHover,
                 defaultReturn: defaultReturn.bind(null, styleActive, styleHover),
                 parent: arg.parent,
-                trueParent: (
-                  (base as any).type === "sentence"
-                  || (base as any).type === "word"
-                ) ? arg.trueParent : (base as RichElement),
+                // here we are passing the true parent to itself
+                // this is its own element so
+                // the true parent is itself
+                trueParent: arg.trueParent,
                 tree: arg.tree,
                 path: arg.path,
                 sentenceNumber: arg.accumulatedSentence.value,
